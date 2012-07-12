@@ -3,5 +3,3 @@ added content
 
 adopt app 
 page: 91
-i will begain
-second edit
