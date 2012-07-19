@@ -24,13 +24,9 @@
           window.clipboardData.clearData(); 
           window.clipboardData.setData("Text", txt); 
           alert("复制成功"); 
-        }  
-        else if(navigator.userAgent.indexOf("Opera") != -1)  
-        { 
+        }  else if(navigator.userAgent.indexOf("Opera") != -1)  { 
           window.location = txt; 
-        }  
-        else
-        { 
+        }  else if(window.netscape){ 
           try { 
             netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect"); 
             } catch (e) { 
@@ -51,6 +47,8 @@
           if (!clip) return false; 
           clip.setData(trans,null,clipid.kGlobalClipboard); 
           alert("复制成功！") 
+        } else {
+          window.prompt("该浏览器不支持访问剪切版，请用Ctrl+c复制文字到剪切版","message");
         } 
       } 
     </script>
