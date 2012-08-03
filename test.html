@@ -1,32 +1,10 @@
+<!doctype html>
 <html>
  <head>
-
  </head>
  <body>
-<script type="text/javascript">
-</script>
-<div>
-            <span>validationCode:</span>
-            <input id="valid_code" name="valid_code" style="width:50px;height:20px">
-            <button id="submitid" >commit</button> 
-            <button id="cancel_download">cancel</button>
-            <input id="result" style="width:50px;height:20px">
-          </div>
-
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-<script src="http://api.yucmedia.com/script/script.js?key=qp68whnolt9dwi7fkmw3q3btr&inputid=valid_code&offtop=300&offleft=235&zbkey=klbr339p8rpjpq6erdxzu1a39"></script>
-<script type="text/javascript">
-  $("#submitid").click(function() {
-          Yucmedia_ajax_verify('valid_code','ajax_proc_func');
-        });
-    var ajax_proc_func = function(var1) {
-           if(var1==1) {//var1=1代表验证成功，否则验证失败                 
-             $("#result").val("验证码输入成功");
-           } else {
-             $("#result").val("验证码输入失败");
-           }
-        };
-      
-  </script>
+     <div style='height:100px;width:200px;border:1px solid red;display:inline-block'></div>
+     <div style='height:100px;width:100px;border:1px solid green;display:inline-block;position:relative;left:100px'></div>
+     <div style='height:100px;width:100px;border:1px solid green;display:inline-block;'></div>
  <body>
 </html>
