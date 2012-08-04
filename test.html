@@ -1,10 +1,32 @@
 <!doctype html>
 <html>
  <head>
+   <style>
+     a.linkto {
+       position:relative;
+     }
+     a.linkto span {
+       display:none;
+     }
+     a.linkto:hover span{
+       position:absolute;
+       display:block;
+     }
+
+   </style>
+   <script src='./getElementsBySelector.js'></script>
  </head>
  <body>
      <div style='height:100px;width:200px;border:1px solid red;display:inline-block'></div>
      <div style='height:100px;width:100px;border:1px solid green;display:inline-block;position:relative;left:100px'></div>
      <div style='height:100px;width:100px;border:1px solid green;display:inline-block;'></div>
+
+     <div style='display:absolute;top:300px;' class='container'>
+       <a class='linkto' href='www.baidu.com' >click me and go to baidu.com<span>external link</span></a>
+     </div>
+     <script>
+       var a = document.getElementsBySelector('div.container span');
+       alert(a.length);
+     </script>
  <body>
 </html>
