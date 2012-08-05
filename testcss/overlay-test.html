@@ -1,0 +1,89 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>无标题文档</title>
+<style>
+  .new_function_overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    overflow: hidden;
+    z-index: 2000;
+    background: black;
+    margin: 0px;
+    width: 100%;
+    height: 100%;
+    opacity: .8;
+  }
+  .func1{
+    color: white;
+    background:black;
+    position: absolute;
+    top: 100px;
+    left: 10px;
+    z-index: 3000;
+    padding: 0 10px;
+  }
+  .func1 dl .arrow {
+    margin: -25px 0 0 0;
+    color: black;
+  }
+  .func1 dl dd {
+    margin-left: 0;
+  }
+  .close-btn:hover {
+    background:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABMAAAATCAYAAAByUDbMAAABtElEQVR42q2Uz2rCQBDG01tpaWlftHcRFTGgPfTQg/+K4iOI2AeQYMGK2FOhVvERiockVk3czi9gaLqJ1dKByTLZmW9nvtkdQykVp2ee5926rvu+Wq0Wvu97rNj8l/3rVCpl/FQNaLvdmqJ+v99fl8tlVSwWlTgGKzb/RT5FHvaBXcjJj/P5fFEoFABI1HQ6rUajkWPb9ovEXWlgjuM8WZa1wflQ7fV6ngA+S/xJCCZ8VMbjsY3DsTocDl1K3oGdQnAmkwkd8vm8knJVo9GIBNbrdf6zHykZDmlKQPhgMFh+DyJABCcAQyCpQCHT6TRyCPSI3BlS86jZbO42tEAAu91uaC+XS7oa8cfm2sDXR6lU4mcSIJIIhEKRULUx+GDEkdvpdCJgZJjUCHg/KjNKbrVaiZn9yhmltdttbA1Q42xfNwGqVqsHdzO8Z9lsNnLPZrMZQFrGk8lE5XK5yD0TIE65BMyQ1O//6wWgcGf95W3ypnmb2tRggwz1q6J3j6mBf9zUQMNHD4c0pVarBXPMNM1grVQqwTyTAbnGL36e6XoqeiMnvzJhhWCbVew3uiZ753GT9guiRwVTo63gwAAAAABJRU5ErkJggg==") -0px -0px no-repeat;
+  }
+  .close-btn {
+    background:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABMAAAATCAYAAAByUDbMAAAByklEQVR42qVUS0tCQRS+CyFoFbQIhCDoT1RUoKX9gyzLnlYuDKpf0cOUNi3aGJZiGPYzxBKDIGgTRBCtxMd9JFdzOp/kcO+1QaWBwzDnfOfjO2fmjMQY+8uGNU07l2X5/ZsW7erv/qGq6gXFR8bGJySrWUlslUolUS6XlWj0suFdWmaTU9OMgM19YdHLwuEIKxZLMuFuCN8vIhsslUov6fTdF5I7WTKZ1IFHnpWsjwLPUANgtwY8KXxFPidDaanUbRWAXg15KLlFZkeDjYBZl5vl83kWDO6aEncCAfgRN/kLhYJMPKOSruun1/F4zRhEAla1WgUhJ6IbZljZ7H1bubhlCTWvrq3zgDURhOFIhJ+pCrax6Tfh5z0epijKp1Sr1XSH0wmniBBLRMStTqtJJmruSShkIoNCEZbK1LpS1mg0eMl7+wdCZR17htIOj45xFhHynolukxP5t7a7v02KDaFe6zt7yOVA1KY4k8kwh3PG5MesYvj5BGAm/zEBCeNs2mg2n2JXV/VeZxPDbpzNlg2Q3Eco7FaR6NfgCqnpMTIVKn2+FeZyzyG5ueMMP/474FqKBGTc7PQEzqgXb3TbGsix4ww/fmIkW+0HBARofTEFA/oAAAAASUVORK5CYII=") -0px -0px no-repeat;
+    height:19px;
+    width:19px;
+    overflow:hidden;
+    top:-13px;
+    right:-12px;
+    padding: 2px 2px 4px;
+    margin-top: 5px;
+    position:absolute;
+  }
+</style>
+</head>
+
+ <body>
+        <p>&nbsp;</p>
+        <p>&nbsp;</p>
+        <p>&nbsp;</p>
+        <p>&nbsp;</p>
+        <p>&nbsp;</p>
+        <p>&nbsp;</p>
+        <p>&nbsp;</p>
+       
+        <div >
+            <div>
+                输入验证码:<input id="testid" name="valid_code" type="text" onkeyup="Yucmedia_ajax_verify('valid_code','ajax_proc_func');" />
+                <input id="result" style="width:50px;height:20px">
+            </div>
+        </div>
+        <div id='yucmediaCaptcha' style="position:absolute;top:250px;left: 5px;"></div>
+       
+        <div class='new_function_overlay'></div>
+        <div class='func1'>
+          <dl>
+            <dd class='arrow'><span>◆</span></dd>
+            <dt>新功能</dt>
+            <hr>
+            <dd>增加了数据拷贝和下载功能</dd>
+          </dl>
+          <div class='close-btn'></div>
+        </div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+<script>
+  $(".close-btn").bind('click', function(){
+    $(".new_function_overlay").remove();
+    $('.func1').remove();
+    $(this).unbind('click');
+  });
+
+</script>
+    </body>
+</html>

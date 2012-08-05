@@ -1,0 +1,58 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+    <meta name="author" content="http://xiaohuochai.net/post-94.html" />
+    <title></title>    
+  </head>
+  <body>
+    <script language="javascript"> 
+      function CopyIt(theField) 
+      { 
+        var tempval=document.getElementById(theField) 
+        tempval.focus() 
+        tempval.select() 
+        copyToClipboard(tempval.value); 
+        //therange=tempval.createTextRange() 
+        //therange.execCommand("Copy") 
+        //window.clipboardData.setData("text",tempval.value); 
+      } 
+
+      function copyToClipboard(txt) { 
+        if(window.clipboardData)  
+        { 
+          window.clipboardData.clearData(); 
+          window.clipboardData.setData("Text", txt); 
+          alert("复制成功"); 
+        }  else if(navigator.userAgent.indexOf("Opera") != -1)  { 
+          window.location = txt; 
+        }  else if(window.netscape){ 
+          try { 
+            netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect"); 
+            } catch (e) { 
+            alert("如果您正在使用FireFox！\n请在浏览器地址栏输入'about:config'并回车\n然后将'signed.applets.codebase_principal_support'设置为'true'"); 
+          } 
+          var clip = Components.classes['@mozilla.org/widget/clipboard;1'].createInstance(Components.interfaces.nsIClipboard); 
+          if (!clip) return; 
+          var trans = Components.classes['@mozilla.org/widget/transferable;1'].createInstance(Components.interfaces.nsITransferable); 
+          if (!trans) return; 
+          trans.addDataFlavor('text/unicode'); 
+          var str = new Object(); 
+          var len = new Object(); 
+          var str = Components.classes["@mozilla.org/supports-string;1"].createInstance(Components.interfaces.nsISupportsString); 
+          var copytext = txt; 
+          str.data = copytext; 
+          trans.setTransferData("text/unicode",str,copytext.length*2); 
+          var clipid = Components.interfaces.nsIClipboard; 
+          if (!clip) return false; 
+          clip.setData(trans,null,clipid.kGlobalClipboard); 
+          alert("复制成功！") 
+        } else {
+          window.prompt("该浏览器不支持访问剪切版，请用Ctrl+c复制文字到剪切版","message");
+        } 
+      } 
+    </script>
+    <input type="text" id="content" value="小火柴.NET"/>
+    <input type="button" onclick="CopyIt('content')" value="复制"/>
+  </body>
+</html>
