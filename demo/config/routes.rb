@@ -1,4 +1,6 @@
 Demo::Application.routes.draw do
+  resources :games
+
   get "say/Hello"
 
   get "say/Goodbye"
