@@ -1,0 +1,6 @@
+#!/bin/bash
+sudo /etc/init.d/redis-server start
+cd dituhui
+PIDFILE=./resque.pid BACKGROUND=yes QUEUE=* rake resque:work --trace
+rake sunspot:solr:start
+#rails s

@@ -1,4 +1,10 @@
 Demo::Application.routes.draw do
+  ActiveAdmin.routes(self)
+
+  devise_for :admin_users, ActiveAdmin::Devise.config
+
+  resources :aas
+
   get "say/Hello"
 
   get "say/Goodbye"

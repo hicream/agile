@@ -1,0 +1,40 @@
+<html>
+  <head>
+    <title></title>
+    <script type="text/javascript" src="http://js.wcdn.cn/t3/platform/js/api/wb.js" charset="utf-8" ></script>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>
+  </head>
+  <body>
+    微博ID:<input type="text" id="id"/><br/>
+    微博数量（最多20条）:<input type="text" id="num"/><br/>
+    <input type="button" onclick="testt($('#id').val(),$('#num').val());" value="button"/>
+  </body>
+  <script type="text/javascript">
+    WB.core.load(['connect', 'client'], function() {
+        var cfg = {
+key: '3274830762',
+xdpath: 'sina.html'
+};
+WB.connect.init(cfg);
+WB.client.init(cfg);
+});
+function testt(id,num){
+  $.ajax({
+url: "http://api.t.sina.com.cn/statuses/user_timeline.json",
+data: "source=941123049&user_id=" + id, //"method=read", //$("#textBox1").children().serialize()
+//source 处是appkey
+dataType: "jason",
+type: "POST",
+success: function(data) {
+var t = eval('(' +data+ ')');
+if (num>20) { num=20; }
+for (i=0;i<num ;i++ ) {
+$("body").append("<br/>" + "[" + i + "]" + t[i].text + "<br/>");
+}
+}
+});
+
+}
+
+</script>
+</html>

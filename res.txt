@@ -1,2 +1,3 @@
-http://note.youdao.com/web/list?username=cutegeo&version=353164&sortMode=0&note=%2FU0MzboM%2Fweb1318472564835&notebook=%2F&keyword=rvm
-null
+IE 下块元素如何实现 display:inline-block 的效果？ 有两种方法： 
+1、先使用 display:inline-block 属性触发块元素，然后再定义 display:inline，让块元素呈递为内联对象 div {display:inline-block;} div {display:inline;} 
+2 p{display:inline-block;width:61px;height:30px;overflow:hidden;margin:0;padding:0;color:red; line-height: 45px;margin: 0 7px;display:inline;zoom:1;
