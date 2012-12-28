@@ -1,24 +1,8 @@
-Demo::Application.routes.draw do
-<<<<<<< HEAD
-  ActiveAdmin.routes(self)
-
-  devise_for :admin_users, ActiveAdmin::Devise.config
-
-  resources :aas
-=======
-  resources :games
->>>>>>> 02d054f5b1c38bf6046c37f54d4ec5df51fc149c
-
-  get "say/Hello"
-
-  get "say/Goodbye"
-
-  get "sy/hello"
-
-  get "sy/goodbye"
+Pagger::Application.routes.draw do
 
   # The priority is based upon order of creation:
   # first created -> highest priority.
+  root :to => "home#index"
 
   # Sample of regular route:
   #   match 'products/:id' => 'catalog#view'
