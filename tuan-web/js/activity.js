@@ -65,7 +65,7 @@ $(function(){
 		}
 	});
 	
-	//这是一个示例
+	//slider
     $('.slider').each(function(){
         new slider(this);
     });
@@ -74,7 +74,7 @@ $(function(){
 	//tabs
 	$.fn.control=function(items,method){
 		method=method||'click';
-		var panels=$(items);
+		var panels=items;
 		
 		var tabs=this;
 		tabs.bind(method,function(){
@@ -88,7 +88,9 @@ $(function(){
 	};
 	
 	
-	$('#temp-tabs li').control('#temp-panels [item="temp-panel"]');
+    $('.tabs').each(function(){
+        $(this).find('.tab_select li').control($(this).find('.temp-panels [item="temp-panel"]'));
+    });
 	
 	var panels=$('#ship-trip [item="stage"]');
 	$('#ships li').control(panels);
