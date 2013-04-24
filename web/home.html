@@ -600,6 +600,11 @@
                         this.dest.find('.nav_ul li').click(function(){
                             var id = $(this).data('id');
                             var sel = '.pic[data-dest="' + id + '"]';
+                            var act = $(this).parent().find('.active');
+                            act.removeClass('active');
+                            act.addClass('deactive');
+                            $(this).removeClass('deactive');
+                            $(this).addClass('active');
                             dest.find('.pic').hide();
                             dest.find(sel).show();
                         });
