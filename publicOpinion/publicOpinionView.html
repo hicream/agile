@@ -1,0 +1,601 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <title>舆情工单详情</title>
+
+        <!--<link href="/app/workflow/config/css/flowApiUpdate/workorder.css"
+        rel="stylesheet" />
+        <link href="/app/workflow/config/css/agent.css" rel="stylesheet" />
+        <script type="text/javascript" src="/framework/js/framework.js"
+            charset="UTF-8"></script>
+        <script type="text/javascript" src="/framework/js/ajaxUtil.js"
+            charset="UTF-8"></script>-->
+        <link href="./mycss/workorder.css" rel="stylesheet" />
+        <link href="./mycss/agent.css" rel="stylesheet" />
+        <script type="text/javascript" src="./myjs/framework.js" charset="UTF-8"></script>
+        <script type="text/javascript" src="./myjs/ajaxUtil.js" charset="UTF-8"></script>
+
+        <script>
+            var currentId="$!flowPop.currentId";
+            var flowId="$!flowPop.flow.flowId";
+            var parentFlowId="$!flowPop.flow.parentId";
+            var nodeId="$!flowPop.flow.lastNode().flowNodeId";
+            var lockId="$!flowPop.flow.lockId";
+            var userId="$!login.userId";
+            var flowConfigId="$!flowPop.flow.flowConfigId";
+            var channel="$!flowPop.flow.flowChannel";
+
+            function playCall(url){
+            url="c://1.mp3";
+            document.MediaPlayer.URL=url;
+            document.MediaPlayer.controls.play();
+            }
+
+            //显示国内机票订单详情
+            function showOrderDetail(orderNo,type,orderId){
+
+            if(type=="国内机票"){
+                var url="/flowbussiness/prepareQueryFlightDetail.call?orderNo="+orderNo;
+                url="/flowapi/flightOrderDetail.call?forward=orderDetail/flightOrderDetail&orderNo="+orderNo;
+                framework.open(url,"国内机票订单详情");
+                }else if(type=="国际机票"){
+                var url="/flowbussiness/prepareQueryIFlightDetail.call?orderNo="+orderNo;
+                url="/flowapi/iflightOrderDetail.call?forward=orderDetail/iflightOrderDetail&orderNo="+orderNo;
+                framework.open(url,"国际机票订单详情");
+                }else{
+                var url="/flowbussiness/fcpDetail.call?id="+orderId;
+                url="/flowapi/fcpOrderDetail.call?forward=orderDetail/fcpOrderDetail&orderId="+orderId;
+                framework.open(url,"超值自游飞订单详情");
+            }
+        }
+
+        //查看工单
+        function viewFlow(flowId,flowType){
+            var url="/flow/get.call";
+            if(flowType=="机票"){
+                url="/flowapiupdate/view.call";
+            }
+
+            url+="?flowId="+flowId;
+            url+="&forward=view";
+            framework.open(url,"工单详细信息");
+        }
+
+        /**开始处理工单*/
+        function doProcess(flowId,flowNodeId,lockId,userId){
+            var url="/flow/updateLockId.json";
+            url+="?flowNodeId="+flowNodeId;
+            url+="&flowId="+flowId;
+            url+="&lockId="+lockId;
+            url+="&userId="+userId;
+            url+="&updateId="+userId;
+            ajaxUtil.update(url,function(result){
+                if(result.success){
+                    var url="/flowapiupdate/view.call";
+                    url+="?flowId="+flowId;
+                    url+="&forward=flightUpdate"
+                    url+="&temp="+new Date().getTime();
+
+                    //url="/flow/get.call?flowId="+flowId+"&forward=prepareUpdate"+"&temp="+new Date().getTime();
+                    framework.go(url,"工单处理");
+                    }else{
+                    alert(result.data);
+                }
+            });
+        }
+
+
+        function reopenFlow(flowActivityId,lastRemark){
+            var data=new Array();   
+            data.push({"name":"flowId","value":"$!flowPop.flow.flowId"});
+            data.push({"name":"updateId","value":"$login.userId"});
+            data.push({"name":"weituo","value":"reopen"});
+            data.push({"name":"lastActivityId","value":flowActivityId});
+            data.push({"name":"lastRemark","value":lastRemark});
+            data.push({"name":"t","value":new Date()});
+
+            var url="/flowextend/reopen.json";
+            ajaxUtil.postJson(url,data,function(result){
+                self.location.reload();
+            });	
+        }
+
+
+        function releaseFlow(flowId,flowNodeId,lockId,channel){
+            var url="/flow/updateLockId.json";
+            url+="?flowNodeId="+flowNodeId;
+            url+="&flowId="+flowId;
+            url+="&lockId="+lockId;
+            url+="&userId="
+            url+="&updateId=$login.userId";
+            ajaxUtil.update(url,function(result){
+                if(result.success){
+                    self.location.reload();
+                    }else{
+                    alert(result.data);
+                }
+            });
+        }
+
+        //cs 节点强制取回 代理商工单
+        function CSBackUpFlow(flowId){
+            var url="/flowextend/getBack.json";
+            url+="?flowId="+flowId;
+            url+="&userId=$login.userId";
+
+            ajaxUtil.update(url,function(result){
+                if(result.success){
+                    self.location.reload();
+                    }else{
+                    alert(result.data);
+                }
+            });
+        }
+
+        //ZT 节点强制取回 代理商工单
+        function ZTBackUpFlow(flowId){
+
+            var url="/flowextend/getBackForZt.json";
+            url+="?flowId="+flowId;
+            url+="&userId=$login.userId";
+            ajaxUtil.update(url,function(result){
+                if(result.success){
+                    self.location.reload();
+                    }else{
+                    alert(result.data);
+                }
+            });
+        }
+
+
+        //ZT 添加代理商工单备注
+        function updateFlowForZTRemark(flowId,userId,lastRemark){
+            var url="/flowextend/updateFlowForZTRemark.json";
+            url+="?flowId="+flowId;
+            url+="&userId="+userId;
+            url+="&lastRemark="+lastRemark;
+            url+="&t="+new Date();
+            ajaxUtil.update(url,function(result){
+                if(result.success){
+                    self.location.reload();
+                    }else{
+                    alert(result.data);
+                }
+            });
+        }
+
+
+        function openFlightServiceRule(){
+            var url="http://kegui.jptonghang.com/dm/Prescribe/guiding.html?Airways=#";
+            framework.open(url,'服务规范');
+        }
+
+        function findCustomer(){
+            var url="/customerinfo/selectQunarIndex.call?contactContent=18810029540";
+            framework.open(url,"客户查询");
+        }
+
+
+        /**下载文件*/
+        function down(fileInfoId){
+            var url="/fileinfo/downloadPage.call";
+            url+="?fileInfoId="+fileInfoId;
+            url=framework.addUser(url);
+            window.open(url);
+        }
+
+
+    </script>
+
+</head>
+<body>
+    <div class="content">
+        <div class="pagetit enmergency">工单  $!flowPop.flow.flowNo</div></div>
+        <div class="col">
+            <div class="outer">
+                <table border="0" class="details" cellpadding="0" cellspacing="0">
+                    <tr>
+                        <td colspan="4"><h4>舆情信息</h4></td>
+                    </tr>
+                    <tr>
+                        <td class="keyname">发布时间：</td>
+                        <td colspan="3" class="arail">$!html.dateTime($!flowPop.flow.flowChannelSource().createTime)</td>
+                        <td class="keyname">抓取时间：</td>
+                        <td colspan="3" class="arail">$!html.dateTime($!flowPop.flow.flowChannelSource().createTime)</td>
+                    </tr>
+
+
+                    <tr>
+                        <td class="keyname">UID 昵称：</td>
+                        <td><span class="arail words1">$!flowPop.flow.flowChannelSource().ani</span>$!flowPop.flow.province &nbsp;&nbsp; $!flowPop.flow.city</td>
+                    </tr>
+
+                    <tr>
+                        <td class="keyname">性别：</td>
+                        <td colspan="3">$!flowPop.customerLevel</td>
+                        <td class="keyname">粉丝数：</td>
+                        <td colspan="3">$!flowPop.customerLevel</td>
+                        <td class="keyname"><em>历史线索：</em></td>
+                        <td colspan="3"><em>增加查询</em></td>
+                    </tr>
+                    <tr>
+                        <td class="keyname">内容：</td>
+                        <td colspan="3" id="pro">$!flowPop.lastDigit</td>
+                    </tr>
+                    <tr>
+                        <td class="keyname">地址：</td>
+                        <td colspan="3"><span class="arail">$!flowPop.queryPhoneNo</span></td>
+                        <td class="keyname">图片：</td>
+                        <td colspan="3"><span class="arail">$!flowPop.queryPhoneNo</span></td>
+                    </tr>
+                </table>
+            </div>
+            <div class="outer">
+                <table border="0" class="details" cellpadding="0" cellspacing="0">
+                    <tr>
+                        <td colspan="2"><h4>用户信息</h4></td>
+                    </tr>
+                    <tr>
+                        <td class="keyname">用户名：</td>
+                        <td class="arail" width="235">$!flowPop.flow.customerInfoId</td>
+                    </tr>
+                    <tr>
+                        <td class="keyname">姓名：</td>
+                        <td><span class="words1">$!flowPop.flow.realName</span>
+                            #if($!flowPop.flow.gender&&$!flowPop.flow.gender=="M") 先生
+                            #elseif($!flowPop.flow.gender&&$!flowPop.flow.gender=="F") 女士
+                            #else 未知 #end</td>
+                    </tr>
+                    <tr>
+                        <td class="keyname">电话：</td>
+                        <td class="arail">
+                            #if($!flowPop.flow.phone&&$!flowPop.flow.phone!="")
+                            $!flowPop.flow.phone #else 无 #end</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="outer">
+                <table border="0" class="details" cellpadding="0" cellspacing="0">
+                    <tr>
+                        <td colspan="2"><h4>工单信息</h4></td>
+                    </tr>
+                    <tr>
+                        <td class="keyname">创建人：</td>
+                        <td width="220">$!permission.user($!flowPop.flow.createId).userName</td>
+                    </tr>
+                    <tr>
+                        <td class="keyname">创建时间：</td>
+                        <td class="arail">$!html.dateTime($!flowPop.flow.createTime)</td>
+                    </tr>
+                    <tr>
+                        <td class="keyname">优先级：</td>
+                        <td class="arail">$html.text("priority","$!flowPop.flow.priority")</td>
+                    </tr>
+                    <tr>
+                        <td class="keyname">关联工单：</td>
+                        <td class="arail">#if($!flowPop.flow.parent()) <a
+                                href="javaScript:"
+                                onclick="viewFlow('$!flowPop.flow.parent().flowId','$!flowPop.flow.flowConfig().flowConfigName')">$!flowPop.flow.parent().flowNo</a>
+                            #elseif($!flowPop.flow.children().size()>0)
+                            <div class="floatp">
+                                <div class="pointer">
+                                    <span class="blue"><b>$!flowPop.flow.children().size()</b></span>
+                                    个
+                                </div>
+                                <table class="historydetail" border="0" class="details"
+                                    cellpadding="0" cellspacing="0">
+                                    <tr class="hs_head">
+                                        <td width="100px">创建时间</td>
+                                        <td width="52px">工单类型</td>
+                                        <td width="200px">问题类型</td>
+                                        <td width="52px">当前节点</td>
+                                    </tr>
+                                    #foreach($flowChildren in $!flowPop.flow.children())
+                                    <tr>
+                                        <td class="blue"><a href="javaScript:"
+                                                onclick="viewFlow('$!flowChildren.flowId','$!flowChildren.flowConfig().flowConfigName')">
+                                                $!html.dateTime($!flowChildren.createTime) </a></td>
+                                        <td>$!flowChildren.flowConfig().flowConfigName</td>
+                                        <td>$!flowChildren.problem0 -$!flowChildren.problem1
+                                            -$!flowChildren.problem2 $!flowChildren.problem3</td>
+                                        <td #if( $!flowHistory.currentNode== "结束")   class="red" #end>
+                                            $!flowChildren.lastActivity().flowActivityName</td>
+                                    </tr>
+                                    #end
+
+                                </table>
+                            </div> #end
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="keyname">当前处理人：</td>
+                        <td>$!permission.user($!flowPop.flow.lockId).userName</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div class="clr clear clr_after"></div>
+        <div class="col">
+            <div class="outer">
+                <table border="0" class="details" cellpadding="0" cellspacing="0">
+                    <tr>
+                        <td colspan="2"><h4>机票信息</h4></td>
+                    </tr>
+                    <tr>
+                        <td class="keyname">问题类别：</td>
+                        <td class="arail" width="282"><span class="words1">
+                                $!flowPop.flow.problem0 - $!flowPop.flow.problem1 -
+                                $!flowPop.flow.problem2 - $!flowPop.flow.problem3</span></td>
+                    </tr>
+                    <tr>
+                        <td class="keyname">代理商：</td>
+                        <td>$!flowPop.flow.show("代理商")</td>
+                    </tr>
+                    <tr>
+                        <td class="keyname">订单号：</td>
+                        <td class="arail blue"><a href="javaScript:"
+                                onclick=showOrderDetail("$!flowPop.flow.show('订单号')","$!flowPop.flow.show('订单来源类型')","$!flowPop.flow.show('业务id')")>
+                                $!flowPop.flow.show("订单号") </a></td>
+                    </tr>
+                    <tr>
+                        <td class="keyname">订单类型：</td>
+                        <td><span class="words1">$!flowPop.flow.show("订单类型")</span> <span
+                                class="blue"> <a href="javaScript:"
+                                    onclick="openFlightServiceRule()">服务规范</a></span></td>
+                    </tr>
+                    <tr>
+                        <td class="keyname">cs处理过：</td>
+                        <td>$!flowPop.flow.show("cs是否处理过")</td>
+                    </tr>
+                    <tr>
+                        <td class="keyname">联系人手机：</td>
+                        <td class="arail">$!flowPop.flow.show("联系人手机")</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="outer">
+                <table border="0" class="details" cellpadding="0" cellspacing="0">
+                    <tr>
+                        <td colspan="4"><h4>处理结果</h4></td>
+                    </tr>
+                    <tr>
+                        <td class="keyname">处理结果：</td>
+                        <td width="224" colspan="3">$!flowPop.flow.show("处理结果")</td>
+                    </tr>
+                    <tr>
+                        <td class="keyname">需赔付：</td>
+                        <td colspan="3">$!flowPop.flow.show("需赔付")
+                        </tr>
+                        <tr>
+                            <td class="keyname">责任归属：</td>
+                            <td colspan="3">$!flowPop.flow.show("责任归属")
+                            </tr>
+                            <tr>
+                                <td class="keyname">赔付类型：</td>
+                                <td>$!flowPop.flow.show("赔付类型")</td>
+                                <td class="keyname">赔付金额：</td>
+                                <td class="arail">$!flowPop.flow.show("赔付金额")</td>
+                            </tr>
+                            <tr>
+                                <td class="keyname">需判罚：</td>
+                                <td>$!flowPop.flow.show("是否判罚")</td>
+                                <td class="keyname">判罚金额：</td>
+                                <td class="arail">$!flowPop.flow.show("判罚金额")</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="outer">
+                        <table border="0" class="details" cellpadding="0" cellspacing="0">
+                            <tr>
+                                <td colspan="2"><h4>详细信息</h4></td>
+                            </tr>
+                            <tr>
+                                <td class="keyname">详细信息：</td>
+                                <td width="220"><span>$!flowPop.flow.businessInfo</span></td>
+                            </tr>
+                            <tr>
+                                <td class="keyname">附件：</td>
+                                <td>#foreach($flowAttach in $flowPop.flow.flowAttachs()) <a
+                                        href="javaScript:" onclick="down('$flowAttach.file.fileInfoId')">$flowAttach.file.fileName</a>
+                                    <br> #end </td>
+                            </tr>
+                            <tr>
+                                <td>&nbsp;</td>
+                                <td><div id="uploadfilebox"></div></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <div class="clr clear clr_after"></div>
+                <div class="tablelist">
+                    <div class="tab">
+                        <ul class="tab_nav" id="tab_page">
+                            <li><a class="active" href="#" data-num="0">处理历史</a></li>
+                            <li><a href="#" data-num="1">详细日志</a></li>
+                            <li><a href="#" data-num="2">通话记录</a></li>
+                        </ul>
+                    </div>
+                    <div id="grid">
+                        <table class="gridrlist" data-index="0">
+                            <thead>
+                                <tr>
+                                    <td>节点</td>
+                                    <td>操作人</td>
+                                    <td class="right" data-op="sort">操作时间<img data-src="0"
+                                        src="/app/workflow/config/img/paixu-m.png"></td>
+                                    <td>系统日志</td>
+                                    <td>备注</td>
+                                </tr>
+                            </thead>
+                            <tbody class="sorted">
+                                #foreach($nodeLog in $!flowPop.flow.usefulLogs())
+                                <tr>
+                                    <td>$!nodeLog.nodeName</td>
+                                    <td>$!{permission.user($nodeLog.createId).userName}</td>
+                                    <td>$!html.dateTime($nodeLog.createTime)</td>
+                                    <td>$!nodeLog.systemRemark</td>
+                                    <td>$html.showRemark($!nodeLog.remark)</td>
+                                </tr>
+                                #end
+                            </tbody>
+                        </table>
+                        <table class="gridrlist" data-index="1" style="display: none">
+                            <thead>
+
+                                <tr>
+                                    <td>节点</td>
+                                    <td>操作人</td>
+                                    <td class="right" data-op="sort">操作时间<img data-src="0"
+                                        src="/app/workflow/config/img/paixu-m.png"></td>
+                                    <td>日志类型</td>
+                                    <td>备注</td>
+                                </tr>
+                            </thead>
+                            <tbody class="sorted">
+                                #foreach($nodeLog in $!flowPop.flow.fullLogs())
+                                <tr>
+                                    <td>$nodeLog.flowNode().flowActivity().flowActivityName</td>
+                                    <td>$!permission.user($nodeLog.createId).userName</td>
+                                    <td>$html.dateTime($nodeLog.createTime)</td>
+                                    <td>$nodeLog.logTypeText()</td>
+                                    <td>$html.showRemark($!nodeLog.remark)</td>
+
+                                </tr>
+                                #foreach($flowRecord in $nodeLog.flowRecordList)
+                                <tr>
+                                    <td></td>
+                                    <td>$permission.user($flowRecord.callLog.userId).userName</td>
+                                    <td>$html.dateTime($flowRecord.callLog.startTime)</td>
+                                    <td><font color='red'>录音</font></td>
+                                    <td>$flowRecord.direction() ($flowRecord.recordLength()s)
+                                        #if($flowRecord.record.playUrl&&$flowRecord.record.playUrl!="")
+                                        <a href="javaScript:" onclick=playCall('$flowRecord.record.playUrl')>
+                                            $flowRecord.otherDn() </a> #else $flowRecord.otherDn() #end &nbsp;
+                                    </td>
+
+                                </tr>
+                                #end #end
+
+
+                            </tbody>
+                        </table>
+                        <table class="gridrlist" data-index="2" style="display: none">
+                            <thead>
+                                <tr>
+                                    <td>类型</td>
+                                    <td>处理人</td>
+                                    <td>主叫号码</td>
+                                    <td>被叫号码</td>
+                                    <td>呼叫方向</td>
+                                    <td>呼叫标识</td>
+                                    <td class="right" data-op="sort">开始时间<img data-src="0"
+                                        src="/app/workflow/config/img/paixu-m.png"></td>
+                                    <td>通话时长</td>
+                                    <td>操作</td>
+                                </tr>
+                            </thead>
+                            <tbody class="sorted">
+
+                                #foreach($record in $!flowPop.recordList)
+                                <tr>
+                                    <td>#if($!flowPop.flow.flowId==$!record.callLog.flowId) 主单
+                                        #else 子单 #end</td>
+                                    <td>$!record.user.userName</td>
+                                    <td>$!record.callLog.ani</td>
+                                    <td>$!record.callLog.dnis</td>
+
+                                    <td>#if($!record.callLog.flowId=="callOut") 呼出 #else 呼入 #end
+                                    </td>
+                                    <td>$!record.callLog.callUuid</td>
+                                    <td class="right">$!record.beginTime</td>
+                                    #if($!record.recordLength>0)
+                                    <td>$!record.recordLength</td>
+                                    <td><a href='javaScript:' onclick=playCall('$!record.playUrl')>播放</a>
+                                        | <a href='$!record.playUrl'>下载</a></td> #else
+                                    <td>0</td>
+                                    <td>录音未创建 $!record.playUrl <a href='javaScript:'
+                                            onclick=playCall('$!record.playUrl')>播放</a> | <a
+                                            href='$!record.playUrl'>下载</a>
+
+                                    </td> #end
+
+                                </tr>
+                                #end
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="page-opbtn" id="manage">
+                    <!--   cs取回工单, 质检工单专用的,暂时用老界面
+                    #if( $!flowPop.flow.csBackable($login))
+                    <dl class="type">
+                        <dt class="csgetback"></dt>
+                        <dd class="tit"  data-type="csetback"  onclick="CSBackUpFlow('$!flowPop.flow.flowId')">CS取回工单</dd>
+                    </dl>
+                    #end
+
+                    $flowPop.flow.isOtaMonitor=="yes" &&
+                    -->
+
+
+                    #if( $!flowPop.flow.isOtaMonitor=="" &&
+                    $!flowPop.flow.lastActivity().flowActivityName=="机票代理商")
+                    <dl class="type" id="remark">
+                        <dt class="remark"></dt>
+                        <dd class="tit">添加备注</dd>
+                    </dl>
+
+                    #if( $login.userName=="陈启隆" || $login.userName=="周宝山")
+                    <dl class="type">
+                        <dt class="getback"></dt>
+                        <dd class="tit" onclick="ZTBackUpFlow('$!flowPop.flow.flowId')">admin取回工单</dd>
+                    </dl>
+                    #end #if( $!flowPop.flow.updateTimePassSeconds() >3600)
+
+                    <dl class="type">
+                        <dt class="getback"></dt>
+                        <dd class="tit" onclick="ZTBackUpFlow('$!flowPop.flow.flowId')">中台取回工单</dd>
+                    </dl>
+                    #end #end #if($!flowPop.flow.isCanDealFlow($login) )
+                    <dl class="type">
+                        <dt class="manage"></dt>
+                        <dd class="tit"
+                        onclick="doProcess('$!flowPop.flow.flowId','$!flowPop.flow.lastNode().flowNodeId','$!flowPop.flow.lockId','$login.userId')">处理</dd>
+                    </dl>
+
+
+                    #end #if($!flowPop.flow.reopenAble($login) &&
+                    $!flowPop.flow.flowConfig().flowConfigName!="质检工单" )
+
+                    <dl class="type" id="reopen">
+                        <dt class="reopen"></dt>
+                        <dd class="tit">重开</dd>
+                    </dl>
+                    #end #if($login.hasPermission("flowUnlock") &&
+                    $html.isNotNull($!flowPop.flow.lockId)&&$!flowPop.flow.lockId!=$login.userId
+                    )
+                    <dl class="type">
+                        <dt class="unlock"></dt>
+                        <dd class="tit"
+                        onclick="releaseFlow('$!flowPop.flow.flowId','$!flowPop.flow.lastNode().flowNodeId','$!flowPop.flow.lockId','$!flowPop.flow.flowChannel')">解锁</dd>
+                    </dl>
+                    #end
+
+                </div>
+            </div>
+            <!--<script type="text/javascript" src="/app/workflow/config/js/base/jquery-1.5.2.source.js"></script>
+            <script type="text/javascript" src="/app/workflow/config/js/base/sort.js"></script>
+            <script type="text/javascript" src="/app/workflow/config/js/base/jquery.qbox.js"></script>
+            <script type="text/javascript" src="/app/workflow/flow/flowApi/js/page/talking.js"></script>
+            <script type="text/javascript" src="/app/workflow/config/js/flowApiUpdate/dealorder.js"></script>-->
+
+            <script type="text/javascript" src="./myjs/jquery-1.5.2.source.js"></script>
+            <script type="text/javascript" src="./myjs/sort.js"></script>
+            <script type="text/javascript" src="./myjs/jquery.qbox.js"></script>
+            <script type="text/javascript" src="./myjs/talking.js"></script>
+            <script type="text/javascript" src="./myjs/dealorder.js"></script>-->
+        </body>
+    </html>

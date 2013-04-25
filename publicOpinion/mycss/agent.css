@@ -1,0 +1,40 @@
+/*颜色*/
+.blue{color: #3366FF;}
+.yellow{color: #FF9900;}
+.red{color: #FF0000;}
+.green{color: #009900}
+.pointer{cursor: pointer;}
+.strong{font-weight: bold;}
+/*话术*/
+.talkfixed{width: 250px;height: 385px;position: fixed;bottom: 20px;right: 0;background-color: #FFFFFF;}
+.talkfixed .tab_nav{ height:26px; border-bottom:1px solid #ccc;background-color: #fff;}
+.talkfixed .tab_nav li{ float:left; display:inline-block;margin-right: 5px;}
+.talkfixed .tab_nav li a{border-radius: 8px 8px 0 0;float:left;display:inline-block;height:26px;background-color: #C4E9FC; line-height:26px; color:#555;position:relative;width:72px;text-align: center;}
+.talkfixed .tab_nav li .active{border:1px solid #ccc;border-bottom-color:#fff; background:#fff; color:#666;font-weight: bold;}
+.talkfixed .light{margin-left:5px;height: 18px;font-family:"宋体";font-size:12px;line-height: 18px;vertical-align: middle;}
+.talkfixed .light img{height: 16px;width: 16px;display: inline-block;}
+.talkfixed .light span{margin-left: 5px;margin-bottom: -2px;height: 18px;}
+.talkfixed .prevstep{margin-left: 5px;cursor: pointer;height: 18px;width: 50px;color: #fff;background-color: #FF9900;font-family:"宋体";font-size:12px;font-weight:bold;line-height: 14px;padding-top: 2px;text-align: center;}
+.talkfixed .confirm_init td{vertical-align: top;padding-right: 5px;}
+.talktext{padding-top: 15px;width: 250px;height: 360px;position: fixed;border-left: 1px solid #ccc;border-right: 1px solid #ccc;border-bottom: 5px solid #ccc;overflow-y: auto;}
+.step{margin: 10px 10px 25px 5px;}
+.step h5{color: #FF770D;font-family:"宋体";font-size:12px;cursor: pointer;}
+.step .cursor0{cursor: default;}
+.step .desc{color: #AEAEAE;font-family:"宋体";font-size:12px;margin: 5px 0;}
+.step .talkway dt{float: left;}
+.step .talkway dd{margin-left: 34px;}
+/*常用工具*/
+.talkfixed .usetool{margin: 10px 15px;font-family:"宋体";font-size:14px;cursor: pointer;}
+/*重发短信 弹出*/
+.remsg{margin: 15px 15px; text-align: center;} 
+.remsg input{width: 480px;height: 26px;}
+.remsg textarea{border: 1px solid #CCCCCC;height: 58px;width: 480px;height: 100px;}
+.remsg td{vertical-align: top;padding: 5px 0;}
+.remsg-error{margin-left: 15px;color:red;} 
+.resendsms-btn{text-align: center;margin-bottom: 20px;;}
+.resendsms-btn button{margin-right: 15px;line-height: 16px;vertical-align: middle;text-align: center;font-size: 12px;width: 60px;}
+/*tab*/
+.tab_nav{ height:26px; border-bottom:1px solid #ccc;background-color: #fff;}
+.tab_nav li{ float:left; display:inline-block;margin-right: 5px;}
+.tab_nav li a{padding:0 5px;border-radius: 8px 8px 0 0;float:left;display:inline-block;height:26px;background-color: #C4E9FC; line-height:26px; color:#555;position:relative;text-align: center;}
+.tab_nav li .active{border:1px solid #ccc;border-bottom-color:#fff; background:#fff; color:#666;font-weight: bold;}

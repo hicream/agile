@@ -1,0 +1,1 @@
+{ "ret": true, "errcode":0, "errmsg":"", "data": [{ "id":100, "product":"weibo", "url":"http://webo.com", "keywords":["去哪儿网qunar","hello word","水员庄辰超","戴政"], "keyWordsStatus":1 },{ "id":200, "product":"腾讯", "url":"http://t.qq.com", "keywords":["去哪儿网qunar","hello word","水员庄辰超","戴政"], "keyWordsStatus":0 }]}
