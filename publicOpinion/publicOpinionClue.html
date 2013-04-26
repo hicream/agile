@@ -1,393 +1,454 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>新增工单</title>
-<link href="/app/workflow/flow/flowApi/css/page/addnew.css" rel="stylesheet" />
-<link href="/app/workflow/flow/flowApi/css/agent.css" rel="stylesheet" />
-<script type="text/javascript" src="/framework/js/framework.js" charset="UTF-8"></script>
-<script type="text/javascript" src="/framework/js/ajaxUtil.js" charset="UTF-8"></script>
-<script type="text/javascript" src="/base/frame/softphone/phoneframework.js" charset="UTF-8"></script>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <title>舆情报表</title>
+        <!--<link href="/app/workflow/flow/flowApi/css/page/addnew.css" rel="stylesheet" />
+        <link href="/app/workflow/flow/flowApi/css/agent.css" rel="stylesheet" />
+        <script type="text/javascript" src="/framework/js/framework.js" charset="UTF-8"></script>
+        <script type="text/javascript" src="/framework/js/ajaxUtil.js" charset="UTF-8"></script>-->
 
-<script type="text/javascript">
-var flowId ="$!flowPop.flow.flowId";
-var callLogId ="$!flowPop.callLogId";
-var currentId="$!flowPop.currentId";
-//显示国内机票订单详情
-function showOrderDetail(orderNo,type,orderId){
-	if(type=="国内机票"){
-		var url="/flowbussiness/prepareQueryFlightDetail.call?orderNo="+orderNo;
-		 //url="/flowapi/flightOrderDetail.call?forward=orderDetail/flightOrderDetail&orderNo="+orderNo;
-		framework.open(url,"国内机票订单详情");
-	}else if(type=="国际机票"){
-		var url="/flowbussiness/prepareQueryIFlightDetail.call?orderNo="+orderNo;
-		// url="/flowapi/iflightOrderDetail.call?forward=orderDetail/iflightOrderDetail&orderNo="+orderNo;
-		framework.open(url,"国际机票订单详情");
-	}else{
-		 var url="/flowbussiness/fcpDetail.call?id="+orderId;
-		 url="/flowapi/fcpOrderDetail.call?forward=orderDetail/fcpOrderDetail&orderId="+orderId;
-	     framework.open(url,"超值自游飞订单详情");
-	}
-}
+        <link href="./mycss/addnew.css" rel="stylesheet" />
+        <link href="./mycss/global.css" rel="stylesheet" />
+        <link href="./mycss/agent.css" rel="stylesheet" />
+        <script type="text/javascript" src="./myjs/framework.js" charset="UTF-8"></script>
+        <script type="text/javascript" src="./myjs/ajaxUtil.js" charset="UTF-8"></script>
+        <style>
+            .gridrlist thead td {
+                white-space: nowrap;
+                padding:0 5px;
+            }
+            .gridrlist tbody .content {
+                max-width:400px;
+            }
+            .gridrlist tbody td {
+                vertical-align: top;
+                padding:5px;
+            }
 
 
-
-function transPhoneToIvr(flowId,phoneNo,orderNo,otcName,otcType,callInPhone){
-	try{
-		//判断软电话状态
-		var state=phoneFramework.getAgentStatus();
-		if(state[2]!="通话中状态"){
-			alert("只有通话中状态才可以转接!");
-			return;
-		}
-		//转代理商之前 检验  
-		var url="/ivrapi/otcPhone.json";
-		var customerCallId=phoneFramework.softphone().customercallId;
-		var data="callUuid="+customerCallId+"&source=agent&orderNo="+orderNo+"&oriFlowId="+flowId+"&otcName="+otcName+"&otaOrderType="+otcType;
-		data+="&customerPhone="+callInPhone;
-		ajaxUtil.json(url,function(result){ },data);
-		// 电话转接代理商
-		//phoneFramework.transOtcIVR(phoneNo,otcName);	
-		//if(phoneNo=="959802788"){
-			//phoneNo="918601040268";
-		//} 
-		 phoneFramework.transOtcIVRNew(phoneNo,otcName);	
-		
-		return;
-	}catch(e){
-		alert("请登录软电话!");
-	}
-}
- 
- 
- 
-function oldFlow(){
-	var url="/flow/get.call";
-	url+="?flowId=$flowPop.flow.flowId";
-	url+="&forward=flowchannel/phone";
-	framework.go(url);
-}
-
-
-function viewFlow(flowId){
-	var url="/flow/get.call";
-	url+="?flowId="+flowId;
-	url+="&forward=view";
-	framework.open(url,"工单详细信息");
-}
-
-function openFlightServiceRule(){
-    var url="http://kegui.jptonghang.com/dm/Prescribe/guiding.html?Airways=#";
-    framework.open(url,'服务规范');
-}
-
-
-function findCustomer(){
-	var url="/customerinfo/selectQunarIndex.call";
-	framework.open(url,"客户查询");
-}
-</script>
-</head>
-<body>  
-	<div class="orderDetail">
-        <div>
-    		<h3>新增工单 $!flowPop.flow.flowNo</h3>
-            <div class="phone">
-                    <table border="0"  class="details"　cellpadding="0" cellspacing="0"  style="z-index:25">
-                            <tr><td colspan="4"><h4>电话信息</h4></td></tr>
-                            <tr><td class="keyname">来电时间：</td><td colspan="3" class="arail"><span class="words1">
-                            	$!html.dateTime($!flowPop.createTime)
-                           </span></td></tr>
+            .orderDetail,.tablelist, .tablelist .condition{
+                width:auto;
+            }
+            .tablelist .gridrlist  {
+                width:100%;
+            }
+            .gridrlist .filter-panel label,.gridrlist .filter-panel a{
+                display:inline-block;
+                padding:5px 10px;
+                width:70px;
+            }
+            .gridrlist .filter-panel label input {
+                vertical-align: text-bottom;
+            }
+            .gridrlist .filter-panel{
+                width:200px;
+                position:absolute;
+                right:0;
+                display:none;
+                background-color:#FFF;
+                border: 1px solid #eee;
+                white-space: normal;
+            }
+            .gridrlist .filter-keywords label{
+                width:100px;
+            }
+            .gridrlist .filter-keywords{
+                width:260px;
+            }
+            .gridrlist .filter{
+                width:13px;
+                height:32px;
+                display:inline-block;
+                background-image:url(./myimg/table_filter.png);
+                vertical-align: middle;
+            }
+            .condition > form{
+                float:left;
+            }
+            .condition .download{
+                float:right;
+                height:24px;
+                line-height:24px;
+            }
+            .tablelist .condition .time{
+                float:none;
+                vertical-align:top;
+                margin-left:10px;
+                width:40px;
+                position:relative;
+            }
+            .time_picker li:hover{
+                background-color:#ddd;
+            }
+            .time_picker li{
+                float: left;
+                margin: 2px 10px;
+                width: 30px;
+                cursor: pointer;
+            }
+            .time_picker{
+                display:none;
+                position: absolute;
+                background-color: #FFF;
+                width: 250px;
+                right: 0;
+                border:1px solid #eee;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="orderDetail">
+            <div class="tablelist" id="tableList">
+                <div class="condition">
+                    <form id="search">
+                        <input class="inputs w16" id='uid' />
+                        <div class="qdate">
+                            <span class="qtext">从</span><input class="inputs" id="fromDate"><input class='inputs time' id='beginTime'>
+                        </div>
+                        <div class="qdate">
+                            <span class="qtext">到</span><input class="inputs" id="toDate"><input class='inputs time' id='endTime'>
+                        </div>
+                        <button class="quiry" id="inquiry">查询</button>
+                    </form>
+                    <div class='download'><a href='javascript:' class="ignore_clues">忽略线索</a></div>
+                </div>
+                <div class='table'>
+                    <table id='grid' class='gridrlist'>
+                        <thead>
                             <tr>
-                                <td class="keyname">来电号码：</td>
-                                <td><span class="arail words1" id="callnumber">$!flowPop.ani</span><span id="phonearea"><span></td>
-                                <td class="keyname td3">历史工单：</td>
-                                <td width="55">
-                             <div class="float"><div class="pointer"  data-op="mouseover" data-remark="历史工单浮层出现次数"><span class="blue"><b>$!flowPop.flowHistoryList.size()</b></span> 个</div>                                        
-                                <div class="historydetail">
-                                        <table  width="600px">
-                                            <tr class="hs_head"><td width="100px">创建时间</td><td width="151px">工单号</td><td width="62px"  style="text-align:center">工单类型</td><td width="200px"  style="text-align:center">问题类型</td><td width="62px">当前节点</td></tr>
-                                       </table> 
-                                       
-                                    <div class="tb-maxheight">
-                                            <table width="600px">
-	                                            #foreach($flowHistory in $flowPop.flowHistoryList)
-	                                               <tr>
-		                                               <td width="100px">$!html.dateTime($!flowHistory.createTime)</td>
-		                                               <td width="151px">
-		                                                  <a href="javaScript:" onclick="viewFlow('$!flowHistory.flowId','$!flowHistory.flowType')">
-			                                                     $!flowHistory.flowNo
-			                                               </a>
-			                                            </td>
-		                                               <td width="62px">$!flowHistory.flowType</td>
-		                                               <td width="200px">$!flowHistory.problem0 -$!flowHistory.problem1 -$!flowHistory.problem2  $!flowHistory.problem3 </td>
-		                                               <td  width="62px" #if( $!flowHistory.currentNode=="结束")   class="red"  #end>$!flowHistory.currentNode</td>
-	                                               </tr>
-	                                            #end
-                                        </table>
-                                   </div>  
-                               </div>
-                               
+                                <td class="" data-op="sort"><input type='checkbox' class='toggle_select'>发布时间<img data-src="0" src="./myimg/paixu-m.png"></td>
+                                <td class="" data-op="sort">抓取时间<img data-src="1" src="./myimg/paixu-m.png"></td>
+                                <td>UID 昵称</td>
+                                <td>性别</td>
+                                <td>历史</td>
+                                <td>内容</td>
+                                <td style='position:relative'>关键词<a href='javascript:' class='filter'></a>
+                                    <div class='filter-panel filter-keywords'>
+                                        <label style='padding-right:100px;width:80px'><input value='-1' type='checkbox'>全部关键词</label>
+                                        <div>
+                                        <a href='javascript:' class='keywords_submit'>确定</a>
+                                        <a href='javascript:' class='keywords_cancel'>取消</a>
+                                        </div>
+                                    </div>
                                 </td>
-                            </tr>
-                            <tr><td class="keyname">用户类型：</td><td colspan="3">$!flowPop.customerLevel</td></tr>
-                            <tr><td class="keyname">咨询产品：</td><td colspan="3" id="pro">$!flowPop.lastDigit</td></tr>
-                            <tr><td class="keyname">查询号码：</td><td colspan="3"><span class="arail words1 js-becopy">$!flowPop.queryPhoneNo</span><span class="blue pointer js-copy">复制</span></td></tr>
-                            <tr><td class="keyname">来电轨迹：</td><td colspan="3">$!flowPop.popIvrStr</td></tr>
-                    </table>       	
-                    <table  class="details" border="0"  cellpadding="0" cellspacing="0" id="usermessage"   style="z-index:23">
-                        <form id="userParam">
-                            <tr><td colspan="2"><h4>用户信息</h4></td></tr>
-                            <tr>
-                                <td class="keyname">用户名：</td>
-                                <td>                                    
-                                    <input value="2124654" name="customerInfoId" class="disable"  data-user="usermsg" disabled="disabled">
-                                    <span class="float" id="customer_msg">
-                                             <span class="pointer"><span class="blue"  data-op="mouseover" data-remark="用户名浮层出现次数"><b id="curst_num">0</b></span> 个</span>
-                                    </span>                                    
+                                <td>图片</td>
+                                <td>地址</td>
+                                <td class="" data-op="sort">粉丝数<img data-src="10" src="./myimg/paixu-m.png"></td>
+                                <td style='position:relative'>状态<a href='javascript:' class='filter'></a>
+                                    <div class='filter-panel'>
+                                        <label style='padding-right:100px;'><input value='-1' type='checkbox'>全部状态</label>
+                                        <label><input value='2' type='checkbox'><span>待处理</span></label>
+                                        <label><input value='1' type='checkbox'><span>已忽略</span></label>
+                                        <label><input value='3' type='checkbox'><span>已处理</span></label>
+                                        <label><input value='0' type='checkbox'><span>待回复</span></label>
+                                        <div>
+                                        <a href='javascript:' class='stat_submit'>确定</a>
+                                        <a href='javascript:' class='stat_cancel'>取消</a>
+                                        </div>
+                                    </div>
                                 </td>
+                                <td>操作</td>
                             </tr>
-                            <tr><td class="keyname">姓名：</td>
-                                 <td>
-                                    <input type="text" class="u118"  name="realName" data-user="usermsg" id="uname">
-                                    <select class="u117" id="usex" name="gender"  data-user="usermsg">
-                                        <option value="M">先生</option>
-                                        <option value="F">女士</option>
-                                    </select>                                
-                        </td>
-                            </tr>
-                            <tr><td class="keyname">联系电话：</td><td><input name="phone"  data-user="usermsg" type="text" class="u673" ></td></tr>                       
-                            <tr><td class="keyname">工单电话：</td><td><input type="text" class="u673 words1 js-becopy" id="uphone"><span class="blue words1 pointer" id="query_phone">查询</span><span class="blue pointer js-copy">复制</span></td></tr>                       
-                            <tr style="display:none">
-                                <td class="keyname">历史来电：</td><td id="historycall"></td>
-                            </tr>
-                        </form>
+                        </thead>
+                        <tbody class="sorted">
+                        </tbody>
                     </table>
-            </div> 
+                </div>
+            </div>
         </div>
-        <div class="clr clear clr_after"></div>  
-        <!-- 切换tab      -->
-        <div class="typestab">
-        
+        <div class='addRelative'>
+            <form style='display:none'>
+                <div><label>姓名</label><input type='text' name='name'><label>联系电话</label><input type='text' name='tel'></div>
+                <div><label>问题类型</label><select name='type'><option value='机票'>机票</option><option value='酒店'>酒店</option><option value='旅游度假'>旅游度假</option><option value='火车票'>火车票</option><option value='门票'>门票</option><option value='当地游'>当地游</option><option value='其他'>其他</option></select><label>订单号</label><input type='text' name='order'></div>
+                <div><label>问题说明</label><textarea rows="3" cols="40" name='desc'></textarea></div>
+                <div><input class='commit' type='submit' value='确定'><input class='cancel' type='reset' value='取消'></div>
+            </form>
+        </div>
 
+
+        <!--<script type="text/javascript" src="/app/workflow/flow/flowApi/js/base/jquery-1.5.2.source.js"></script>
+        <script type="text/javascript" src="/app/workflow/flow/flowApi/js/base/grid.js"></script>
+        <script type="text/javascript" src="/app/workflow/flow/flowApi/js/base/base.js"></script>
+        <script type="text/javascript" src="/app/workflow/flow/flowApi/js/base/jquery.qbox.js"></script>
+        <script type="text/javascript" src="/app/workflow/flow/flowApi/js/base/dialog.js"></script>
+        <script type="text/javascript" src="/app/workflow/flow/flowApi/js/base/qdatepicker.js"></script>
+        <script type="text/javascript" src="/app/workflow/flow/flowApi/js/base/selector.js"></script>
+        <script type="text/javascript" src="/app/workflow/flow/flowApi/js/page/workorder/orderpage.js"></script>-->
+        <script type="text/javascript" src="./myjs/jquery-1.5.2.source.js"></script>
+        <script type="text/javascript" src="./myjs/grid.js"></script>
+        <script type="text/javascript" src="./myjs/base.js"></script>
+        <script type="text/javascript" src="./myjs/jquery.qbox.js"></script>
+        <script type="text/javascript" src="./myjs/dialog.js"></script>
+        <script type="text/javascript" src="./myjs/qdatepicker.js"></script>
+        <script type="text/javascript" src="./myjs/selector.js"></script>
+        <script type="text/javascript" src="./myjs/orderpage.js"></script>
+        <script type="text/javascript" src="./myjs/timepicker.js"></script>
+        <script>
+            var webRoot = '';
+            !function(fromDateObj, toDateObj){
+                var fromDateObj = $('#fromDate'), toDateObj = $('#toDate');
+                var date1 = {
+                    ui : 'qunar',
+                    customClass : 'qunar-dp-toD',
+                    defaultDay :(new Date()).getTime(),
+                    multi : 1,
+                    linkTo : toDateObj,
+                    linkRules : '+0D,+0D'
+                };
+
+                var date2 = {
+                    ui : 'qunar',
+                    customClass : 'qunar-dp-toD',
+                    refObj : fromDateObj,
+                    defaultDay : (new Date()).getTime(),
+                    multi : 1
+                };
+
+                fromDateObj.qdatepicker(date1);// 日期控件的设置
+                toDateObj.qdatepicker(date2);
+                $('#beginTime').timePicker();
+                $('#endTime').timePicker();
+            }();
+            var flowId = "$!flowPop.flow.flowId";
+            var callLogId = "$!flowPop.callLogId";
+            var currentId = "$!flowPop.currentId";
+        </script>
+        <!--<script src="${webRoot}/app/workflow/flow/js/jquery.flow.js" type="text/javascript" charset="UTF-8"></script>
+        <script type="text/javascript" src="/app/workflow/config/js/base/sort.js"></script>
+        <script type="text/javascript" src="/app/workflow/config/js/flowApiUpdate/dealorder.js"></script>-->
+
+        <script src="./myjs/jquery.flow.js" type="text/javascript" charset="UTF-8"></script>
+        <script type="text/javascript" src="./myjs/sort.js"></script>
+        <script type="text/javascript" src="./myjs/dealorder.js"></script>
+        <script type="text/javascript">
+            $('#inquiry').bind('click',function(e){
+                var me = $(this),data = {};
+                data.uid = $('#uid').val();
+                data.startTime = $('#fromDate').val() + ' ' + $('#beginTime').val();
+                data.endTime = $('#toDate').val() + ' ' + $('#endTime').val();
+                getData(data);
+                return false;
+            });
             
-#foreach($flowConfig in $flowPop.flowConfigList)
-      #if( $!flowConfig.flowConfigName=="机票")
-         <dl class="type">
-                <dt class="flight" data-confid="$!flowConfig.flowConfigId"></dt>
-                <dd class="tit">$!flowConfig.flowConfigName</dd>
-                 <dd class="list">
-                    <table  border="0"  cellpadding="0" cellspacing="0">
-					 #foreach($flowProblem in $flowConfig.flowProblemList)
-					     <tr><td class="gridtype js-talking" data-name="$!flowProblem.flowProblemName"     data-proid="$!flowProblem.flowProblemId">  $!flowProblem.flowProblemName</td></tr>
-					 #end	
-		      </table>
-                </dd>
-            </dl>
-     #end	
-<!--     只能建立机票工单 --
-      #if( $!flowConfig.flowConfigName=="旅游酒店")
-         <dl class="type">
-                <dt class="hotel" data-confid="$!flowConfig.flowConfigId"></dt>
-                <dd class="tit">酒店</dd>
-                 <dd class="list">
-                    <table  border="0"  cellpadding="0" cellspacing="0">
-					 #foreach($flowProblem in $flowConfig.flowProblemList)
-					      #if( $!flowProblem.flowProblemName=="酒店团购")
-					     <tr><td class="gridtype"  data-type="tuan" data-name="$!flowProblem.flowProblemName"     data-proid="$!flowProblem.flowProblemId">  $!flowProblem.flowProblemName</td></tr>
-					     #else
-					      <tr><td class="gridtype"  data-type="hotel" data-name="$!flowProblem.flowProblemName"     data-proid="$!flowProblem.flowProblemId">  $!flowProblem.flowProblemName</td></tr>
-					     #end
-					 #end	
-		      </table>
-                </dd>
-            </dl>
-     #end	
+            //筛选按钮显隐
+            $('.filter').click(function(){ $(this).next('.filter-panel').toggle(); });
+            $('.filter-panel .keywords_cancel,.filter-panel .stat_cancel').click(function(){ $(this).parents('.filter-panel').hide(); });
+            $('.filter-panel .keywords_submit,.filter-panel .stat_submit').click(function(){
+                var data= {queryType: 'clue'};
+                var words = $(this).parents('.filter-panel').find('label input:checked');
+                if(!words.length) return;
+                $(this).parents('.filter-panel').hide();
+                if(this.className === 'keywords_submit'){
+                    data.keywords = [];
+                    words.each(function(w,obj){
+                        if(obj.value == '-1'){
+                            data.keywords = [];
+                            return false;
+                        }else{
+                            data.keywords.push(obj.value);
+                        }
+                    });
+                }else{
+                    data.processStatus = [];
+                    words.each(function(w,obj){
+                        if(obj.value == '-1'){
+                            data.processStatus = [];
+                            return false;
+                        }else{
+                            data.processStatus.push(obj.value);
+                        }
+                    });
+                }
 
-      #if( $!flowConfig.flowConfigName=="度假")
-         <dl class="type">
-                <dt class="package" data-confid="$!flowConfig.flowConfigId"></dt>
-                <dd class="tit">旅游度假</dd>
-                 <dd class="list">
-                    <table  border="0"  cellpadding="0" cellspacing="0">
-					 #foreach($flowProblem in $flowConfig.flowProblemList)
-					      #if( $!flowProblem.flowProblemName=="旅游团购")
-					     <tr><td class="gridtype"  data-type="tuan" data-name="$!flowProblem.flowProblemName"     data-proid="$!flowProblem.flowProblemId">  $!flowProblem.flowProblemName</td></tr>
-					     #else
-					      <tr><td class="gridtype"  data-type="travel" data-name="$!flowProblem.flowProblemName"     data-proid="$!flowProblem.flowProblemId">  $!flowProblem.flowProblemName</td></tr>
-					     #end
-					 #end	
-		      </table>
-                </dd>
-            </dl>
-     #end	
-     
-         #if( $!flowConfig.flowConfigName=="火车票")
-         <dl class="type">
-                <dt class="train" data-confid="$!flowConfig.flowConfigId"></dt>
-                <dd class="tit"  data-type="train" data-name="$!flowConfig.flowConfigName">$!flowConfig.flowConfigName</dd>
-            </dl>
-        #end	
-        
-       #if( $!flowConfig.flowConfigName=="门票")
-         <dl class="type">
-                <dt class="ticket" data-confid="$!flowConfig.flowConfigId"></dt>
-                <dd class="tit"  data-type="ticket" data-name="$!flowConfig.flowConfigName">$!flowConfig.flowConfigName</dd>
-            </dl>
-        #end	  
-        
-        #if( $!flowConfig.flowConfigName=="当地游")
-         <dl class="type">
-                <dt class="local_travel" data-confid="$!flowConfig.flowConfigId"></dt>
-                <dd class="tit"  data-type="local_travel" data-name="$!flowConfig.flowConfigName">$!flowConfig.flowConfigName</dd>
-            </dl>
-        #end	
-        
-        #if( $!flowConfig.flowConfigName=="其他")
-         <dl class="type">
-                <dt class="others" data-confid="$!flowConfig.flowConfigId"></dt>
-                <dd class="tit"  data-type="other" data-name="$!flowConfig.flowConfigName">$!flowConfig.flowConfigName</dd>
-            </dl>
-        #end	
--->
+                getData(data);
+
+            });
+//toggler select
+$('.toggle_select').click(function(e){
+    var allCheck = $('.gridrlist tbody td:first-child input');
+    $(this).attr('checked') ? allCheck.attr('checked',true) : allCheck.attr('checked',false);
+    e.stopPropagation();
+});
+//筛选
+function getData(data){
+    var url="./publicOpinion/queryClue.json";
+    $.ajax({
+        url: url,
+        data: data || '',
+        type: "GET",
+        cache: false,
+        dataType: 'json',
+        success:function(result){
+            if(result.ret)
+                addToTable(result.data);
+        }
+    })
+}
+//查询舆情关键字
+function getKeyWords(){
+    var url="./publicOpinion/querySetting.json";
+    $.ajax({
+        url: url,
+        type: "GET",
+        cache: false,
+        dataType: 'json',
+        success:function(result){
+            if(result.ret && result.data.length>0)
+                updateKeyWords(result.data[0].keywords);
+        }
+    })
+}
+
+function updateKeyWords(obj){
+    obj = obj || [];
+    for(var i=0,len=obj.length;i<len;i++){
+        var strFmt = '<label><input type="checkbox" value="' + obj[i] + '"><span>' + obj[i] + '</span></label>';
+        $(strFmt).insertAfter('.filter-keywords label:first-child');
+    }
+}
+
+//工单详情
+function viewFlow(flowId) {
+    var url = "/flow/get.call";
+    url += "?flowId=" + flowId;
+    url += "&forward=view";
+    framework.open(url, "工单详细信息");
+}
+
+//添加联系人
+function addRelative(that){
+    fm.show();
+    var parent = $(that).parents('tr');
+    var id = parent.data('id');
+    fm.data('id',id);
+}
+
+var fm = $('.addRelative form');
+$('.addRelative form .commit').click(function(){
+    var ip = fm.find('[name^=]');
+    var len = ip.length;
+    var data={id: fm.data('id')};
+    while(len--){
+        var obj = $(ip[len]);
+        data[obj.attr('name')] = obj.val();
+    }
+    var url = '';
+    $.ajax({
+            url: url,
+            type: 'POST',
+            cache: false,
+            data: data,
+            dataType: 'json',
+            success: function(){
+            //TODO:
+            if(true){
+            resetForm();
+            addOrder(parent.find('td:last-child a'));
+            }
+        }
+    });
+    return false;
+})
+$('.addRelative form .cancel').click(function(){ resetForm(); })
+//隐藏浮窗，清除数据
+function resetForm(){
+    var fm = $('.addRelative form');
+     fm.find('[name^=]').val('');
+     fm.hide();
+}
+//生成工单
+function addOrder(that){
+    var parnetTr = $(that).parents('tr');
+    var data = {processStatus: 3,mid: parnetTr.data('mid'),id: parnetTr.data('id')};
+    updateClue(data, function(stat){
+            that.onclick = '';
+            $(that).parent().prev('td').empty().append(changeStat(stat));
+            $(that).parent().empty().append(changeOper(stat));
+            parnetTr.data('stat',stat);
+            window.open('new window');
+            })
+}
+
+//回复线索,忽略线索
+function replyIgnoreClue(that,open){
+    var parnetTr = $(that).parents('tr');
+    var stat = open ? 0 : 1;
+    var data = {processStatus: stat,mid: parnetTr.data('mid'),id: parnetTr.data('id')};
+    updateClue(data, function(stat){
+            that.onclick = '';
+            $(that).parent().prev('td').empty().append(changeStat(stat));
+            $(that).parent().empty().append(changeOper(stat));
+            parnetTr.data('stat',stat);
+            open && window.open('new window');
+            })
+}
+
+$('.ignore_clues').click(function(){
+    var checked = $('.gridrlist tbody input:checked');
+    checked.each(function(index, obj){
+    $(obj).parents('tr').find('.ignore').click();
+    });
+})
 
 
-	#end
-	
- 
-          <dl class="type">
-                <dt class="others" ></dt>
-                <dd class="tit"  data-type="other"  onclick="oldFlow()">其他</dd>
-           </dl>
- 
-     
-            
-            
-        </div>   
-        <div class="clr clear clr_after"></div>  
-        <div class="tablelist" id="tableList" style="display:none">
-            <div class="condition">
-               <form id="search">
-                    <input class="inputs w16" name="telephone">                    
-                    <div class="qdate"><span class="qtext">从</span><input class="inputs" name="begintime" id="fromDate"></div>
-                    <div  class="qdate"><span  class="qtext">到</span><input class="inputs w16" name="endtime" id="toDate"></div>
-                    <button class="quiry" id="inquiry">查询</button>
-                </form>
-            </div>
-            <div id="grid"></div>
-        </div>          
-        <!-- 生成工单 -->
-        <div class="orderdetails js-setorder"  style="display:none">
-            <h4>问题类别</h4>
-        </div>
-        <div class="handledetails">
-            <ul class="hands " id="handledetail" style="display:none">
-                <h4>生成工单</h4>                                      
-            </ul>                     
-        </div>
-        <div class="clr clear clr_after"></div>  
-        <div class="dohandle" >
-            <div class="opretabtn">
-                <dl class="type" id="close_order">
-                    <dt class="finished"></dt>
-                    <dd class="yellow">关单</dd>
-                </dl>  
-                <dl class="type" id="transfer_order">
-                    <dt class="transfer"></dt>
-                    <dd class="yellow">工单转接</dd>
-                </dl>                  
-                <dl class="type" id="combine_order">
-                    <dt class="combine"></dt>
-                    <dd class="yellow">工单合并</dd>
-                </dl>                 
-            </div>          
-        </div>
-	</div>
-	
-	
-	<!-- 话术 -->
-        <div class="talkfixed" id="tab">
-            <div>
-                <ul class="tab_nav">
-                    <li><a href="" class="active" data-tab="1">话术</a></li>
-                    <li><a href="" data-tab="3">常用工具</a></li>
-                </ul>
-            </div>
-            <div class="talktext js-showtab" id="stepdom" data-tabshow="1">
-                <div class="step">
-                    <h5>>>开头语</h5>
-                    <div class="desc">【说明】首次来电用户，无用户姓氏信息；接通后系统自动报客服工号</div>
-                    <dl class="talkway">
-                        <dt>客服：</dt>
-                        <dd>您好，请问有什么可以帮您？</dd>
-                    </dl>
-                    <div class="desc">【说明】二次来电用户，有用户姓氏信息；接通后系统自动报客服工号</div>
-                    <dl class="talkway">
-                        <dt>客服：</dt>
-                        <dd>您好，X先生/女士，请问有什么可以帮您？</dd>
-                    </dl>
-                </div>
-                <div class="step">
-                    <h5>>>需求确认</h5>
-                    <div class="desc">【说明】根据用户来电需求，选择性使用以下话术确认用户信息及订单信息</div>
-                    <table class="confirm_init">
-                        <tr><td>A</td><td>请问怎么称呼您？</td></tr>                    
-                        <tr><td>B</td><td>请问您是通过手机用户端还是在去哪儿网网站上做的预订/查询？</dd></tr> 
-                        <tr><td>C</td><td>请您提供订单中的联系方式？</td></tr>                    
-                        <tr><td>D</td><td>请问您预订的从哪到哪的航班？</td></tr>                    
-                        <tr><td>E</td><td>请问您是通过那个代理商做的预订？</td></tr>                     
-                        <tr><td>F</td><td>请问您预订的是几号的航班？乘机人几位？</td>  
-                        </table>                  
-                </div>
-                <div class="step">
-                    <h5>>>结束语</h5>
-                    <div class="desc">转IVR</div>
-                    <dl class="talkway">
-                        <dt>客服：</dt>
-                        <dd>XX先生/女士请问还有什么可以再帮您？请稍等，不要挂机</dd>
-                    </dl>
-                    <div class="desc">转代理商</div>
-                    <dl class="talkway">
-                        <dt>客服：</dt>
-                        <dd>XX先生/女士，非常抱歉。 您反馈的问题需我帮您转接到代理商协助处理</dd>
-                    </dl>                    
-                    <div class="desc">客人同意</div>
-                    <dl class="talkway">
-                        <dt>客服：</dt>
-                        <dd>马上为您转接，请稍等不要挂机</dd>
-                    </dl>                    
-                    <div class="desc">客人不同意</div>
-                    <dl class="talkway">
-                        <dt></dt>
-                        <dd>根据用户需求记录工单转出</dd>
-                    </dl>
-                </div>                
-            </div>
-            <div class="talktext js-showtab" id="usetools" data-tabshow="3" style="display:none">              
-                <div class="usetool">
-                    <a id="reSendsms">短信发送 ></a>
-                </div>
-                <div class="usetool">
-                   <a href="javaScript:" onclick="openFlightServiceRule()">航空公司服务规范 ></a> 
-                </div>
-                
-                <div class="usetool">
-                   <a href="javaScript:" onclick="findCustomer()">客户查询 ></a> 
-                </div>
-                
-                
-            </div>
-        </div>
-<script type="text/javascript" src="/app/workflow/flow/flowApi/js/base/jquery-1.5.2.source.js"></script>
-<script type="text/javascript" src="/app/workflow/flow/flowApi/js/base/grid.js"></script>
-<script type="text/javascript" src="/app/workflow/flow/flowApi/js/base/base.js"></script>
-<script type="text/javascript" src="/app/workflow/flow/flowApi/js/base/jquery.qbox.js"></script>
-<script type="text/javascript" src="/app/workflow/flow/flowApi/js/base/dialog.js"></script>
-<script type="text/javascript" src="/app/workflow/flow/flowApi/js/base/qdatepicker.js"></script>
-<script type="text/javascript" src="/app/workflow/flow/flowApi/js/base/selector.js"></script>
-<script type="text/javascript" src="/app/workflow/flow/flowApi/js/page/workorder/orderpage.js"></script>
-<script type="text/javascript" src="/app/workflow/flow/flowApi/js/page/workorder/addorder.js"></script>
-<script type="text/javascript" src="/app/workflow/flow/flowApi/js/page/calculator.js"></script>
-<script type="text/javascript" src="/app/workflow/flow/flowApi/js/page/talking.js"></script>
+//更新线索状态ajax
+function updateClue(data,callback){
+    var url="./publicOpinion/updateClueStatus.json";
+    $.ajax({
+        url: url,
+        data: data || '',
+        type: "POST",
+        cache: false,
+        dataType: 'json',
+        success:function(obj){
+            if(obj.ret)
+            callback(obj.data.processStatus);
+        }
+    })
+
+}
+function addToTable(ds) {
+    $('.gridrlist>tbody tr').remove();
+    for(var i=0,len=ds.length;i<len;i++){
+        var d = ds[i];
+        var img = typeof d.img !== 'undefined' ? '<a target="_black" href="' + d.img + '">图片</a>' : '';
+        var contentUrl = typeof d.contentUrl !== 'undefined' ? '<a target="_black" href="' + d.contentUrl + '">微博</a>' : '';
+        var stat = changeStat(d.processStatus);
+        var operate = changeOper(d.processStatus);
+        var gongdan = '<a href="javascript:" onclick="' + "showFlow('a8d3f543ae3541af996c39fdcdbb089a','机票')" + '">' + d.gongdan + '</a>';
+
+        var str = '<tr data-stat="' + d.processStatus + '" data-id="' + d.id + '" data-mid="' + d.mid + '"><td><input type="checkbox" value="' + d.mid + '">' + d.pubTime + '</td><td>' + d.crawTime + '</td><td>' + d.userinfo.nickName + '</td><td>' + d.userinfo.gender + '</td><td>' + d.historyCount + '</td><td class="content">' + d.content + '</td><td>' + d.keywords + '</td><td>' + img + '</td><td>' + contentUrl + '</td><td>' + d.userinfo.fans + '</td><td>' + stat + '</td><td>' + operate + '</td></tr>';
+        $('.gridrlist>tbody').append($(str));
+    }
+}
+var statObj = {0:['待回复','red','生成工单'],1:['已忽略','gray', '生成工单'],2:['待处理','green','回复线索,忽略线索'],3:['已处理','oringe','工单详情']};
+function changeStat(stat){
+    var str = '<span style="color:' + statObj[stat][1] + '">' + statObj[stat][0] + '</span>';
+    return str;
+}
+function changeOper(stat){
+    var res = '';
+    switch(stat){
+        case 0:
+        case 1:
+             res = '<a href="javascript:" onclick="addRelative(this)">'  + statObj[stat][2]+ '</a>';
+             break;
+        case 2:
+            var op = statObj[stat][2].split(',');
+            res = '<a href="javascript:" onclick="replyIgnoreClue(this,true)">' + op[0] + '</a><br/><br/><a href="javascript:" class="ignore" onclick="replyIgnoreClue(this,false)">' + op[1] + '</a>';
+            break;
+        case 3:
+            res = '<a href="javascript:" onclick="alert(\'' + statObj[stat][2] + '\')">' + statObj[stat][2] + '</a>';
+            break;
+        default:
+            break;
+    }
+    return res;
+
+}
+getData();
+getKeyWords();
+</script>
 </body>
 </html>
