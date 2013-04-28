@@ -26,7 +26,6 @@
                 padding:5px;
             }
 
-
             .orderDetail,.tablelist, .tablelist .condition{
                 width:auto;
             }
@@ -87,7 +86,7 @@
                             <span class="qtext">到</span><input class="inputs w16"
                             name="endtime" id="toDate">
                         </div>
-                        <button class="quiry" id="inquiry">查询</button>
+                        <button class="quiry" id="inquiry">查询</button><label style='margin-left:20px;' class='query_result'></label>
                     </form>
                     <div class='download'><a href='javascript:' style='padding-right:20px' class="ignore_clues">忽略线索</a><a href='javascript:' class="download_report">下载报表</a></div>
                 </div>
@@ -153,7 +152,16 @@
         <script type="text/javascript" src="/app/workflow/flow/flowApi/js/base/dialog.js"></script>
         <script type="text/javascript" src="/app/workflow/flow/flowApi/js/base/qdatepicker.js"></script>
         <script type="text/javascript" src="/app/workflow/flow/flowApi/js/base/selector.js"></script>
-        <script type="text/javascript" src="/app/workflow/flow/flowApi/js/page/workorder/orderpage.js"></script>-->
+        <script type="text/javascript" src="/app/workflow/flow/flowApi/js/page/workorder/orderpage.js"></script>
+        <script src="${webRoot}/app/workflow/flow/js/jquery.flow.js" type="text/javascript" charset="UTF-8"></script>
+        <script type="text/javascript" src="/app/workflow/config/js/base/sort.js"></script>
+        <script type="text/javascript" src="/app/workflow/config/js/flowApiUpdate/dealorder.js"></script>-->
+        <script type='text/javascript'>
+            var flowId = "$!flowPop.flow.flowId";
+            var callLogId = "$!flowPop.callLogId";
+            var currentId = "$!flowPop.currentId";
+
+        </script>
         <script type="text/javascript" src="./myjs/jquery-1.5.2.source.js"></script>
         <script type="text/javascript" src="./myjs/grid.js"></script>
         <script type="text/javascript" src="./myjs/base.js"></script>
@@ -162,6 +170,9 @@
         <script type="text/javascript" src="./myjs/qdatepicker.js"></script>
         <script type="text/javascript" src="./myjs/selector.js"></script>
         <script type="text/javascript" src="./myjs/orderpage.js"></script>
+        <script src="./myjs/jquery.flow.js" type="text/javascript" charset="UTF-8"></script>
+        <script type="text/javascript" src="./myjs/sort.js"></script>
+        <script type="text/javascript" src="./myjs/dealorder.js"></script>
         <script>
             var webRoot = '';
             !function(fromDateObj, toDateObj){
@@ -178,31 +189,20 @@
                     ui : 'qunar',
                     customClass : 'qunar-dp-toD',
                     refObj : fromDateObj,
-                    defaultDay : (new Date()).getTime(),
+                    defaultDay :new Date(new Date().setDate(new Date().getDate() - 1)).getTime(),
                     multi : 1
                 };
 
                 fromDateObj.qdatepicker(date1);// 日期控件的设置
                 toDateObj.qdatepicker(date2);
             }($('#fromDate'),$('#toDate'));
-            var flowId = "$!flowPop.flow.flowId";
-            var callLogId = "$!flowPop.callLogId";
-            var currentId = "$!flowPop.currentId";
-        </script>
-        <!--<script src="${webRoot}/app/workflow/flow/js/jquery.flow.js" type="text/javascript" charset="UTF-8"></script>
-        <script type="text/javascript" src="/app/workflow/config/js/base/sort.js"></script>
-        <script type="text/javascript" src="/app/workflow/config/js/flowApiUpdate/dealorder.js"></script>-->
 
-        <script src="./myjs/jquery.flow.js" type="text/javascript" charset="UTF-8"></script>
-        <script type="text/javascript" src="./myjs/sort.js"></script>
-        <script type="text/javascript" src="./myjs/dealorder.js"></script>
-        <script type="text/javascript">
             $('#inquiry').bind('click',function(e){
                     //TODO:添加时间的选项
                 var val = $(this).closest('telephone').val();
                 var data = {};
                 data.uid = val;
-                getData(data);
+                getData(data,function(count){$('.query_result').text('共 '+count+' 条结果')});
 
                 return false;
             });
@@ -247,7 +247,7 @@ $('.toggle_select').click(function(e){
     e.stopPropagation();
 });
 //筛选
-function getData(data){
+function getData(data,opt){
     var url="./publicOpinion/queryClue.json";
     $.ajax({
         url: url,
@@ -256,8 +256,10 @@ function getData(data){
         cache: false,
         dataType: 'json',
         success:function(result){
-            if(result.ret)
+            if(result.ret && result.data){
                 addToTable(result.data);
+                opt && opt(result.data.length);
+            }
         }
     })
 }
@@ -394,11 +396,40 @@ function addToTable(ds) {
         var operate = changeOper(d.processStatus);
         var gongdan = '<a href="javascript:" onclick="' + "showFlow('a8d3f543ae3541af996c39fdcdbb089a','机票')" + '">' + d.gongdan + '</a>';
 
-        var str = '<tr data-stat="' + d.processStatus + '" data-id="' + d.id + '" data-mid="' + d.mid + '"><td><input type="checkbox" value="' + d.mid + '">' + d.pubTime + '</td><td>' + d.crawTime + '</td><td>' + d.replyTime + '</td><td>' + d.userinfo.nickName + '</td><td>' + d.userinfo.gender + '</td><td>' + d.historyCount + '</td><td class="content">' + d.content + '</td><td>' + d.keywords + '</td><td>' + img + '</td><td>' + contentUrl + '</td><td>' + d.userinfo.fans + '</td><td>' + stat + '</td><td>' + operate + '</td></tr>';
+        var str = '<tr data-stat="' + d.processStatus + '" data-id="' + d.id + '" data-mid="' + d.mid + '"><td><input type="checkbox" value="' + d.mid + '">' + d.pubTime + '</td><td>' + d.crawTime + '</td>' + getReplyTimeTD(d.replyTime) + '<td>' + d.userinfo.nickName + '</td><td>' + d.userinfo.gender + '</td><td>' + d.historyCount + '</td><td class="content">' + d.content + '</td><td>' + d.keywords + '</td><td>' + img + '</td><td>' + contentUrl + '</td><td>' + d.userinfo.fans + '</td><td>' + stat + '</td><td>' + operate + '</td></tr>';
         $('.gridrlist>tbody').append($(str));
     }
 }
-var statObj = {0:['待回复','red','生成工单'],1:['已忽略','gray', '生成工单'],2:['待处理','green','回复线索,忽略线索'],3:['已处理','oringe','工单详情']};
+function getReplyTimeTD(time){
+    return time == '' ? '<td onclick="editReplyTime(this)"></td>' : '<td>' + time + '</td>';
+}
+function editReplyTime(me){
+    $(me).data('value',$(me).text());
+    var str = '<div><form><input type="input"><br/><input type="submit" style="background-image:url()"><input type="reset" style="background-image:url()"></form></div>';
+    $(me).text('').append($(str));
+    $(me).find('input[type="reset"]').click(function(){
+        $(me).text($(me).data('value'));
+        $(me).empty();
+        return false;
+    })
+    $(me).find('input[type="submit"]').click(function(){
+        //TODO:如何传data；
+        var t = $(this).closest('input').val();
+        var d = {};
+        $.ajax({
+            url: '/publicOpinion/queryClue.json',
+            type: 'POST',
+            data: d,
+            dataType: 'json',
+            success: function(text){
+                $(me).empty();
+                $(me).text(text);
+            }
+        });
+        return false;
+    });
+}
+var statObj = {0:['待回复','red','生成工单'],1:['已忽略','gray', '生成工单'],2:['待处理','green','回复线索,忽略线索'],3:['已处理','orange','工单详情']};
 function changeStat(stat){
     var str = '<span style="color:' + statObj[stat][1] + '">' + statObj[stat][0] + '</span>';
     return str;

@@ -304,7 +304,7 @@ function addToTable(ds) {
         var d = ds[i];
         var img = typeof d.img !== 'undefined' ? '<a target="_black" href="' + d.img + '">图片</a>' : '';
         var contentUrl = typeof d.contentUrl !== 'undefined' ? '<a target="_black" href="' + d.contentUrl + '">微博</a>' : '';
-        var statObj = {0:['待回复','red'],1:['已忽略','gray'],2:['待处理','green'],3:['已处理','oringe']};
+        var statObj = {0:['待回复','red'],1:['已忽略','gray'],2:['待处理','green'],3:['已处理','orange']};
         var stat = '<span style="color:' + statObj[d.status][1] + '">' + statObj[d.status][0] + '</span>';
         var gongdan = '<a href="javascript:" onclick="' + "showFlow('a8d3f543ae3541af996c39fdcdbb089a','机票')" + '">' + d.gongdan + '</a>';
 
