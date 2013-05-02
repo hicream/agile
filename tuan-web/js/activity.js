@@ -80,7 +80,6 @@ $(function(){
 		tabs.bind(method,function(){
 			tabs.removeClass('active').addClass('deactive');
 			$(this).removeClass('deactive').addClass('active');
-		debugger	
 			panels.hide().eq($(this).index()).show();
 		});
 		
