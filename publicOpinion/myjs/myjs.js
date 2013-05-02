@@ -255,12 +255,16 @@ function editReplyTime(me){
     $(me).data('value',$(me).text());
     var str = '<div><form><input type="input"><br/><input type="submit" style="background-image:url()"><input type="reset" style="background-image:url()"></form></div>';
     $(me).text('').append($(str));
-    $(me).find('input[type="reset"]').click(function(){
+
+    $(me).find('input[type="input"]').bind('click',function(e){
+        e.stopPropagation();
+    })
+    $(me).find('input[type="reset"]').bind('click',function(){
         $(me).text($(me).data('value'));
         $(me).empty();
         return false;
     })
-    $(me).find('input[type="submit"]').click(function(){
+    $(me).find('input[type="submit"]').bind('click',function(){
         //TODO:如何传data；
         var t = $(this).closest('input').val();
         var d = {};
