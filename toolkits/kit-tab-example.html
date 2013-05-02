@@ -38,5 +38,20 @@
         </div>
         <script src='./jquery-1.7.2.min.js' type='text/javascript'></script>
         <script src='./kit-tab.js' type='text/javascript'></script>
+        <script>
+            function myclass(){
+                this.id='myClass';
+                var idd = 'myclass';
+            }
+            myclass.prototype.constructor=function(){
+                this.name1='name1';
+                var name2 = 'name2';
+            }
+            myclass.prototype={
+                pro: 'prototype'
+            }
+            var obj = new myclass();
+            alert('');
+        </script>
     </body>
 </html>

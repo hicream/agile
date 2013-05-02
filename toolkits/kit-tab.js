@@ -17,6 +17,7 @@
 
   Tab.prototype = {
 
+    //never work
     constructor: Tab ,
 
     show: function () {
