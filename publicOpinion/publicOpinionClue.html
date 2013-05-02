@@ -11,80 +11,27 @@
         <link href="./mycss/addnew.css" rel="stylesheet" />
         <link href="./mycss/global.css" rel="stylesheet" />
         <link href="./mycss/agent.css" rel="stylesheet" />
+        <link href="./mycss/clue.css" rel="stylesheet" />
         <script type="text/javascript" src="./myjs/framework.js" charset="UTF-8"></script>
         <script type="text/javascript" src="./myjs/ajaxUtil.js" charset="UTF-8"></script>
-        <style>
-            .gridrlist thead td {
-                white-space: nowrap;
-                padding:0 5px;
-            }
-            .gridrlist tbody .content {
-                max-width:400px;
-            }
-            .gridrlist tbody td {
-                vertical-align: top;
-                padding:5px;
-            }
-
-            .orderDetail,.tablelist, .tablelist .condition{
-                width:auto;
-            }
-            .tablelist .gridrlist  {
-                width:100%;
-            }
-            .gridrlist .filter-panel label,.gridrlist .filter-panel a{
-                display:inline-block;
-                padding:5px 10px;
-                width:70px;
-            }
-            .gridrlist .filter-panel label input {
-                vertical-align: text-bottom;
-            }
-            .gridrlist .filter-panel{
-                width:200px;
-                position:absolute;
-                right:0;
-                display:none;
-                background-color:#FFF;
-                border: 1px solid #eee;
-                white-space: normal;
-            }
-            .gridrlist .filter-keywords label{
-                width:100px;
-            }
-            .gridrlist .filter-keywords{
-                width:260px;
-            }
-            .gridrlist .filter{
-                width:13px;
-                height:32px;
-                display:inline-block;
-                background-image:url(./myimg/table_filter.png);
-                vertical-align: middle;
-            }
-            /*查询部分*/
-            .condition > form{
-                float:left;
-            }
-            .condition .download{
-                float:right;
-                height:24px;
-                line-height:24px;
-            }
-        </style>
     </head>
     <body>
         <div class="orderDetail">
-            <div class="tablelist" id="tableList">
+            <div class='tabs'>
+            <ul>
+                <li class='active'>今日线索<label style='margin-left:20px'></label></li>
+                <li class='deactive'>历史线索</li>
+            </ul>
+            <div class="tablelist" id="tableList_now">
                 <div class="condition">
                     <form id="search">
-                        <input class="inputs w16" id='uid' />
-                        <button class="quiry" id="inquiry">查询</button><label style='margin-left:20px;' class='query_result'></label>
+                        <input class="inputs w16 uid" />
+                        <button class="quiry" id="inquiry_now">查询</button><label style='margin-left:20px;' class='query_result'></label>
                     </form>
                     <div class='download'><a href='javascript:' class="ignore_clues">忽略线索</a></div>
                 </div>
                 <div class='table'>
-                    <table id='grid' class='gridrlist'>
+                    <table id='table_now' class='gridrlist'>
                         <thead>
                             <tr>
                                 <td class="" data-op="sort"><input type='checkbox' class='toggle_select'>发布时间<img data-src="0" src="./myimg/paixu-m.png"></td>
@@ -126,6 +73,66 @@
                     </table>
                 </div>
             </div>
+            <div class="tablelist" id="tableList_history">
+                <div class="condition">
+                    <form id="search">
+                        <input class="inputs w16 uid" />
+                        <div class="qdate">
+                            <span class="qtext">从</span><input class="inputs" name="begintime" id="fromDate">
+                        </div>
+                        <div class="qdate">
+                            <span class="qtext">到</span><input class="inputs w16" name="endtime" id="toDate">
+                        </div>
+                        <button class="quiry" id="inquiry_his">查询</button><label style='margin-left:20px;' class='query_result'></label>
+                    </form>
+                    <div class='download'><a href='javascript:' style='padding-right:20px' class="ignore_clues">忽略线索</a><a href='javascript:' class="download_report">下载报表</a></div>
+                </div>
+                <div class='table'>
+                    <table id='table_his' class='gridrlist'>
+                        <thead>
+                            <tr>
+                                <td class="" data-op="sort"><input type='checkbox' class='toggle_select'>发布时间<img data-src="0" src="./myimg/paixu-m.png"></td>
+                                <td class="" data-op="sort">抓取时间<img data-src="1" src="./myimg/paixu-m.png"></td>
+                                <td class="" data-op="sort">回复时间<img data-src="2" src="./myimg/paixu-m.png"></td>
+                                <td>UID 昵称</td>
+                                <td>性别</td>
+                                <td>历史</td>
+                                <td>内容</td>
+                                <td style='position:relative'>关键词<a href='javascript:' class='filter'></a>
+                                    <div class='filter-panel filter-keywords'>
+                                        <label style='padding-right:100px;width:80px'><input value='-1' type='checkbox'>全部关键词</label>
+                                        <div>
+                                        <a href='javascript:' class='keywords_submit'>确定</a>
+                                        <a href='javascript:' class='keywords_cancel'>取消</a>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>图片</td>
+                                <td>地址</td>
+                                <td class="" data-op="sort">粉丝数<img data-src="10" src="./myimg/paixu-m.png"></td>
+                                <td style='position:relative'>状态<a href='javascript:' class='filter'></a>
+                                    <div class='filter-panel'>
+                                        <label style='padding-right:100px;'><input value='-1' type='checkbox'>全部状态</label>
+                                        <label><input value='2' type='checkbox'><span>待处理</span></label>
+                                        <label><input value='1' type='checkbox'><span>已忽略</span></label>
+                                        <label><input value='3' type='checkbox'><span>已处理</span></label>
+                                        <label><input value='0' type='checkbox'><span>待回复</span></label>
+                                        <div>
+                                        <a href='javascript:' class='stat_submit'>确定</a>
+                                        <a href='javascript:' class='stat_cancel'>取消</a>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>操作</td>
+                            </tr>
+                        </thead>
+                        <tbody class="sorted">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            </div>
+            
         </div>
         <div class='addRelative'>
             <form style='display:none'>
@@ -166,5 +173,6 @@
         <script type="text/javascript" src="./myjs/sort.js"></script>
         <script type="text/javascript" src="./myjs/dealorder.js"></script>
         <script type="text/javascript" src="./myjs/myjs.js"></script>
+
     </body>
 </html>
