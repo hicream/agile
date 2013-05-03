@@ -26,23 +26,22 @@
             container       : window,
             data_attribute  : "original",
             skip_invisible  : true,
-            appear          : null,
-            load            : null
+            appear          : null,//Function,trigger before img show;
+            load            : null //Function,trigger after img show;
         };
 
         function update() {
             var counter = 0;
       
+            //遍历所有的图片
             elements.each(function() {
                 var $this = $(this);
                 if (settings.skip_invisible && !$this.is(":visible")) {
                     return;
                 }
-                if ($.abovethetop(this, settings) ||
-                    $.leftofbegin(this, settings)) {
+                if ($.abovethetop(this, settings) || $.leftofbegin(this, settings)) {
                         /* Nothing. */
-                } else if (!$.belowthefold(this, settings) &&
-                    !$.rightoffold(this, settings)) {
+                } else if (!$.belowthefold(this, settings) && !$.rightoffold(this, settings)) {
                         $this.trigger("appear");
                 } else {
                     if (++counter > settings.failure_limit) {
@@ -68,8 +67,7 @@
         }
 
         /* Cache container as jQuery as object. */
-        $container = (settings.container === undefined ||
-                      settings.container === window) ? $window : $(settings.container);
+        $container = (settings.container === undefined || settings.container === window) ? $window : $(settings.container);
 
         /* Fire one scroll event per scroll. Not one scroll event per image. */
         if (0 === settings.event.indexOf("scroll")) {
@@ -81,7 +79,6 @@
         this.each(function() {
             var self = this;
             var $self = $(self);
-
             self.loaded = false;
 
             /* When appear is triggered load original image. */
@@ -91,26 +88,20 @@
                         var elements_left = elements.length;
                         settings.appear.call(self, elements_left, settings);
                     }
-                    $("<img />")
-                        .bind("load", function() {
-                            $self
-                                .hide()
-                                .attr("src", $self.data(settings.data_attribute))
-                                [settings.effect](settings.effect_speed);
-                            self.loaded = true;
+                    //TODO 改进：不需要重新创建img，而且img标签更改了src之后删除data的值；图片更换完src后，相应的事件也要解绑。
+                    $self.hide().attr("src", $self.data(settings.data_attribute))[settings.effect](settings.effect_speed).removeAttr('data-' + settings.data_attribute);
+                    self.loaded = true;
 
-                            /* Remove image from array so it is not looped next time. */
-                            var temp = $.grep(elements, function(element) {
-                                return !element.loaded;
-                            });
-                            elements = $(temp);
+                    /* Remove image from array so it is not looped next time. */
+                    var temp = $.grep(elements, function(element) {
+                        return !element.loaded;
+                    });
+                    elements = $(temp);     
 
-                            if (settings.load) {
-                                var elements_left = elements.length;
-                                settings.load.call(self, elements_left, settings);
-                            }
-                        })
-                        .attr("src", $self.data(settings.data_attribute));
+                    if (settings.load) {
+                        var elements_left = elements.length;
+                        settings.load.call(self, elements_left, settings);
+                    }
                 }
             });
 
@@ -208,3 +199,13 @@
     });
 
 })(jQuery, window);
+
+
+/*  用法
+    $(function() {
+        $("img[data-original^=]").lazyload({
+            effect : "fadeIn",
+        });
+    });
+ 
+ * /
