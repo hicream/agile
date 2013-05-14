@@ -78,6 +78,14 @@
      <script>
        var a = document.getElementsBySelector('div.container span');
        //alert(a.length);
+
+       var first = {name: 'charles', tel: 12323232322}
+       function dowork(obj){
+           obj = obj || {name: 'alex'};
+           return this.toString() + obj.name;
+       }
+
+       debugger;
      </script>
  <body>
 </html>
