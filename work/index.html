@@ -1,36 +1,101 @@
 ﻿<!doctype html>
 <html>
     <head>
-        <link href='common.css' rel='stylesheet' type='text/css'>
+        <link href='./css/ui.css' rel='stylesheet' type='text/css'>
     </head>
     <body>
         <div class='body'>
-            <div class='header'></div>
+            <div class='header color3'>
+                <ul>
+                    <li><span>2013-04-26</span></li>
+                    <li><span>星期五</span></li>
+                    <li class='drop-down color3 open'><a href='javascript:;'><i></i>谭校长<b class='caret-down'></b></a><ul class='menu'><li><a href='javascript:;'>修改密码</a></li><li><a href='javascript:;'>修改头像</a></li><li><a href='javascript:;'>修改绑定电话</a></li><li><a href='javascript:;'>退出登录</a></li></ul></li>
+                </ul>
+                
+            </div>
             <div class='content'>
                 <div class='clearfix top'>
                     <div class='sub'>首页</div>
                     <div class='sub'>联系历史</div>
                     <div class='sub'>工单</div>
-                    <div class='sub'></div>
+                    <div class='sub sel'><span class='tel'>&nbsp;</span><span>186****2819 北京...</span><span class='close'>&nbsp;</span></div>
+                    <div class='sub'><span class='order'>&nbsp;</span><span>FC20130418...</span><span class='close'>&nbsp;</span></div>
+                    <div class='sub'><span class='day'>&nbsp;</span><span>2013041875...</span><span class='close'>&nbsp;</span></div>
                 </div>
                 <div class='clearfix middle'>
                     <div class='left'>
                         <div class='clearfix msg'>
                             <ul>
-                                <li>245呼出</li>
-                                <li>509呼入</li>
-                                <li>1378通话时长（分钟）</li>
-                                <li>45在线咨询</li>
+                                <li><span class='nu'>245</span><span class='op'>呼出</span></li>
+                                <li><span class='nu'>509</span><span class='op'>呼入</span></li>
+                                <li><span class='nu'>1378</span><span class='op'>通话时长（分钟）</span></li>
+                                <li><span class='nu'>45</span><span class='op'>在线咨询</span></li>
                             </ul>
                         </div>
-                        <div class='task'></div>
+                        <div class='task'>
+                            <h3 class='title'>代办任务</h3>
+                            <div>
+                                <table class='table'>
+                                    <thead>
+                                        <tr><td>到达时间</td><td>工单号</td><td>工单类型</td><td>产品类别</td><td> 剩余处理时间</td><td></td></tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td><span>2013/05/07  10:00</span></td><td><a href=''>FC20130418101103875931</a></td><td>未处理</td><td>投诉/电话错误</td><td>3小时23分</td><td><a class='op'>处理</a></td></tr>
+                                        <tr><td><span>2013/05/07  10:00</span></td><td><a href=''>FC20130418101103875931</a></td><td>未处理</td><td>投诉/电话错误</td><td>3小时23分</td><td><a class='op'>处理</a></td></tr>
+                                        <tr><td><span>2013/05/07  10:00</span></td><td><a href=''>FC20130418101103875931</a></td><td>未处理</td><td>投诉/电话错误</td><td>3小时23分</td><td><a class='op'>处理</a></td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                         <div class='notice'></div>
                     </div>
-                    <div class='right'></div>
+                    <div class='right'>
+                        <div class='clearfix u-info'>
+                            <img src='./img/14.png'/>
+                            <div>
+                                <div class='name'>王煜</div>
+                                <div class='tel'><span>18610410098</span><a href=''>修改</a></div>
+                                <div class='name'>忙碌</div>
+                            </div>
+                        </div>
+                        <div class='u-dial'>
+                            <div><span>通话时间：</span><span>00:18:23</span></div>
+                            <ul class='clearfix oper'>
+                                <li ><a href='javascript:;'><span class='hold'></span><span>保持</span></a></li>
+                                <li ><a href='javascript:;'><span class='adapter'></span><span>转接</span></a></li>
+                                <li ><a href='javascript:;'><span class='hung'></span><span>挂断</span></a></li>
+                            </ul>
+                        </div>
+                        <div><b>最近通话</b></div>
+                        <div class='current'>
+                            <ul>
+                                <li class='out'><div class='info'><span class='tl'>186****2819</span><span class='color9'>北京北京</span><br/><span class='tm'>12：36  2013/05/06</span></div><span class='icon-phone'></span></li>
+                                <li class='in'><div class='info'><span class='tl'>186****2819</span><span class='color9'>北京北京</span><br/><span class='tm'>12：36  2013/05/06</span></div><span class='icon-phone'></span></li>
+                                <li class='warn'><div class='info'><span class='tl'>186****2819</span><span class='ad'>北京北京</span><br/><span class='tm'>12：36  2013/05/06</span></div><span class='icon-phone'></span></li>
+                                <li class='in'><div class='info'><span class='tl'>186****2819</span><span class='color9'>北京北京</span><br/><span class='tm'>12：36  2013/05/06</span></div><span class='icon-phone'></span></li>
+                                <li class='in'><div class='info'><span class='tl'>186****2819</span><span class='color9'>北京北京</span><br/><span class='tm'>12：36  2013/05/06</span></div><span class='icon-phone'></span></li>
+                            </ul>
+                        </div>
+                        <div><b>坐席状态</b></div>
+                        <div class='stat'>
+                            <div class='st st1'>张三 （2057）</div>
+                            <div class='st st1'>李四 （2057）</div>
+                            <div class='st st2'>王五 （2057）</div>
+                            <div class='st st2'>杨六 （2057）</div>
+                            <div class='st st3'>丁七 （2057）</div>
+                            <div class='st st3'>张三 （2057）</div>
+                            <div class='st st3'>李四 （2057）</div>
+                            <div class='st st3'>李四 （2057）</div>
+                            <div class='st st2'>王五 （2057）</div>
+                            <div class='st st2'>王五 （2057）</div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class='footer'></div>
+            <div class='footer'> © 2013-2014 北京趣拿软件公司版权所有 About Qunar</div>
 
         </div>
+        <script src='./js/jquery-1.9.1.js' type='text/javascript'></script>
+        <script src='./js/ui.js' type='text/javascript'></script>
     </body>
 </html>
