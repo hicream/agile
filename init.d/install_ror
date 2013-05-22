@@ -1,0 +1,92 @@
+#Install git-core:
+sudo apt-get install git-core
+
+#install vim
+sudo apt-get install vim
+git clone git://github.com/wongyouth/vimfiles ~/vimfiles
+ln -s ~/vimfiles ~/.vim
+echo "source ~/.vim/vimrc" > ~/.vimrc
+echo "source ~/.vim/gvimrc" > ~/.gvimrc
+cd ~/.vim
+git submodule init
+git submodule update
+vim +BundleInstall +qall
+
+#install rvm:
+sudo apt-get update
+sudo apt-get install curl bison build-essential  zlib1g-dev libssl-dev libreadline6-dev libxml2-dev
+bash < <(curl -s https://raw.github.com/wayneeseguin/rvm/master/binscripts/rvm-installer )
+echo '[[ -s "$HOME/.rvm/scripts/rvm" ]] && . "$HOME/.rvm/scripts/rvm" # Load RVM function' >> ~/.bash_profile
+source .bash_profile
+
+#Install Ruby env and rails：使用 rvm 可以安装所有到环境。
+#在终端-》编辑 -》配置文件首选项-》 “以登录 shell 方式运行命令 ”
+rvm install 1.9.2    # 安装1.9.2
+rvm use 1.9.2 --default       # 将1.9.2置为默认版本
+rvm -v                   # 验证版本
+rvm rubygems 1.7.2 | latest       #Install rubygems。 如果以前是用 sudo方式安装的话，使用sudo apt-get autoremove先删除，然后再运行 sudo apt-get autoclean清理一下。//sudo apt-get install rubygems       //install gems
+gem update --system                     # 安装/更新 gem，如果安装正确的话，时间较长。
+gem install rails -v=3.2.0    # 安装固定版本 install rails。//sudo gem install rails -v=3.2.0
+rails -v             # 察看版本
+
+#Install mysql：
+sudo apt-get install libmysql-ruby libmysqlclient-dev
+sudo apt-get install mysql-server libmysql-ruby
+curl -O http://cdn.mysql.com/Downloads/MySQLGUITools/mysql-workbench-gpl-5.2.43-1ubu1204-i386.deb      #Install mysql workbench
+sudo dpkg -i mysql-workbench-gpl-5.2.43-1ubu1204-i386.deb；
+
+Install Redis：
+
+curl -O http://redis.googlecode.com/files/redis-2.4.4.tar.gz
+tar xzf redis-2.4.4.tar.gz
+cd redis-2.4.4
+make
+#若需要tcl的安装，请看这里：http://www.linuxfromscratch.org/blfs/view/cvs/general/tcl.html
+#Redis的安装细节看这里：http://www.cnblogs.com/yjf512/archive/2012/02/20/2358799.html
+
+#Install sqlite database:
+sudo apt-get install sqlite3 libsqlite3-dev
+
+#Install goolge chrome:
+curl -O https://dl.google.com/linux/direct/google-chrome-stable_current_i386.deb
+sudo dpkg -i google-chrome-stable_current_i386.deb        //https://www.google.com/chrome/eula.html?platform=linux_ubuntu_i386
+
+# install Sublime
+#http://c758482.r82.cf2.rackcdn.com/Sublime%20Text%202.0.1.tar.bz2
+#tar jxf filename.tar.bz2
+
+#将关闭窗口放在最右面：
+#gconftool-2 --set /apps/metacity/general/button_layout --type string "menu:minimize,maximize,close"
+
+#将中文目录改回为英文：
+export LANG=en_US && xdg-user-dirs-gtk-update && export LANG=zh_CN.UTF-8
+
+#install QQ:
+#download from ：http://www.longene.org/download/WineQQ2012-20120719-Longene.deb
+#sudo dpkg -i package_file.deb
+
+
+#install jdk
+#curl -O http://download.oracle.com/otn-pub/java/jdk/7u21-b11/jdk-7u21-linux-i586.tar.gz
+#download from http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html
+#首先把JDK拷贝到指定的目录，然后解压缩拷贝后的文件到指定的目录中，具体命令行如下：
+
+#sudo mkdir /usr/lib/jvm
+#sudo cp jdk-6u30-linux-i586.bin /usr/lib/jvm 
+#cd /usr/lib/jvm
+##赋予可执行权限：
+#chmod +x ./jdk-6u30-linux-i586.bin
+#sudo ./jdk-6u30-linux-i586.bin 
+#sudo mv jdk1.6.0_30/ java-1.6.0_30-sun/ 
+#sudo ln -s java-1.6.0_30-sun java-6-sun 
+#sudo rm jdk-6u30-linux-i586.bin 
+##其次设置环境变量，主要是PATH、CLASSPATH和JAVA_HOME，注意PATH最后所添加的bin目录：
+#sudo vi /etc/environment 
+#PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/lib/jvm/java-6-sun/bin" 
+#CLASSPATH="/usr/lib/jvm/java-6-sun/lib" 
+#JAVA_HOME="/usr/lib/jvm/java-6-sun" 
+##然后就是要告诉系统，我们使用的sun的JDK，而非OpenJDK了：
+#sudo update-alternatives --install /usr/bin/java java /usr/lib/jvm/java-6-sun/bin/java 300 
+#sudo update-alternatives --install /usr/bin/javac javac /usr/lib/jvm/java-6-sun/bin/javac 300 
+#sudo update-alternatives --config java 
+#java -version 
