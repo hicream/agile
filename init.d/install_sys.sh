@@ -1,8 +1,13 @@
+#!/bin/sh
+#commont
+#command
+
 echo ==================================以登录shell的方式运行命令；=================================
 echo ========================================Install git-core:==================================
 #sudo apt-get install git-core
 #git config --global user.name "charleslei"
-#charles@li:~/work/agile$ git config --global user.email superwanderman@gmail.com
+#git config --global user.email superwanderman@gmail.com
+#git config --global color.ui true
 
 echo =====================================相关命令=====================================================
 #sudo apt-get install tree
@@ -40,9 +45,8 @@ echo ============================================install vim====================
 echo ==============================================install rvm=====================================
 #sudo apt-get update
 #sudo apt-get install curl bison build-essential  zlib1g-dev libssl-dev libreadline6-dev libxml2-dev
-#bash < <(curl -s https://raw.github.com/wayneeseguin/rvm/master/binscripts/rvm-installer )
-#echo '[[ -s "$HOME/.rvm/scripts/rvm" ]] && . "$HOME/.rvm/scripts/rvm" # Load RVM function' >> ~/.bash_profile
-#source .bash_profile  #
+#curl -s https://raw.github.com/wayneeseguin/rvm/master/binscripts/rvm-installer | bash
+#echo '[[ -s "$HOME/.rvm/scripts/rvm" ]] && . "$HOME/.rvm/scripts/rvm" # Load RVM function' >> ~/.profile
 #source ~/.profile
 
 echo =======================================Install Ruby env and rails：使用 rvm 可以安装所有到环境===================================。
@@ -115,8 +119,9 @@ echo ===========================================install jdk=====================
 #sudo update-alternatives --config java 
 #java -version 
 
-
+echo ===================================================install maven2=====================================
 #sudo apt-get install maven2
+#mvn -v
 
 echo =================================install gnome-shell================================================================
 ##install ppa
