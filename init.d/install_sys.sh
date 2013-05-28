@@ -119,8 +119,9 @@ echo ===========================================install jdk=====================
 #sudo update-alternatives --config java 
 #java -version 
 
-
+echo ===================================================install maven2=====================================
 #sudo apt-get install maven2
+#mvn -v
 
 echo =================================install gnome-shell================================================================
 ##install ppa
