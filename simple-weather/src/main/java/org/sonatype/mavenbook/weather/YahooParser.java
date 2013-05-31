@@ -1,4 +1,5 @@
 package org.sonatype.mavenbook.weather;
+
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
@@ -10,6 +11,7 @@ import org.dom4j.DocumentFactory;
 import org.dom4j.io.SAXReader;
 public class YahooParser {
   private static Logger log = Logger.getLogger(YahooParser.class);
+
   public Weather parse(InputStream inputStream) throws Exception {
     Weather weather = new Weather();
     log.info( "Creating XML Reader" );
@@ -25,6 +27,7 @@ public class YahooParser {
     weather.setHumidity( doc.valueOf("/rss/channel/y:atmosphere/@humidity") );
     return weather;
   }
+
   private SAXReader createXmlReader() {
     Map<String,String> uris = new HashMap<String,String>();
     uris.put( "y", "http://xml.weather.yahoo.com/ns/rss/1.0" );
