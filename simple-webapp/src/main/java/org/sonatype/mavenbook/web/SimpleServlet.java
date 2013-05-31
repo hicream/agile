@@ -1,8 +1,8 @@
 package org.sonatype.mavenbook.web;
 
 import java.io.*;
-import java.servlet.*;
-import java.servlet.http.*;
+import javax.servlet.*;
+import javax.servlet.http.*;
 
 public class SimpleServlet extends HttpServlet {
 
