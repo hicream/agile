@@ -169,8 +169,7 @@ class Fetcher:
 class SiteCopyer:
     def __init__(self,url):
         self.baseurl = url
-        self.home = 'aaaa'
-        #self.home = self.baseurl.split('/')[2]
+        self.home = self.baseurl.split('/')[2]
         self.f = Fetcher(threads=10)
         self.create_dir()
 
