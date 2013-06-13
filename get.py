@@ -1,12 +1,16 @@
 #coding:utf-8
+# -*- coding: utf-8 -*-  
 import re,os,shutil,sys
 import urllib2,socket,cookielib
+import pdb
 from threading import Thread,stack_size,Lock
 from Queue import Queue
 import time
 from gzip import GzipFile
 from StringIO import StringIO
+from bs4 import BeautifulSoup
 
+#http://s.weibo.com/weibo/qunar&xsort=time&nodup=1
 class ContentEncodingProcessor(urllib2.BaseHandler):
   """A handler to add gzip capabilities to urllib2 requests """
 
@@ -42,29 +46,6 @@ def deflate(data):   # zlib only provides the zlib compress format, not the defl
     return zlib.decompress(data)
 
 class Fetcher:
-    '''
-    html Fetcher
-
-    basic usage
-    -----------
-    from fetcher import Fetcher
-    f = Fetcher()
-    f.get(url)
-
-    post
-    ----
-    req = urllib2.Request(...)
-    f.post(req)
-
-    multi-thread
-    ------------
-    f = Fetcher(threads=10)
-    for url in urls:
-        f.push(url)
-    while f.taskleft()
-        url,html = f.pop()
-        deal_with(url,html)
-    '''
     def __init__(self,timeout=10,threads=None,stacksize=32768*16,loginfunc=None):
         #proxy_support = urllib2.ProxyHandler({'http':'http://localhost:3128'})
         cookie_support = urllib2.HTTPCookieProcessor(cookielib.CookieJar())
@@ -229,45 +210,113 @@ class SiteCopyer:
         else:
             return ''
 
+    def strip_dl(self, dl):
+      res = {}
+      bdl = BeautifulSoup(dl)
+      ps =  bdl.find_all('p') # 2 results;the first is content;the second is controller;
+      #get mid, uid, screen_name, m_add, 
+      for pinfo in ps:
+        if pinfo.get('class') and pinfo.get('class').count('info') > 0:
+          #pdb.set_trace()
+          info1 = pinfo.find('span').find_all('a')[1]
+          temp = {}
+          for ms in info1.get('action-data').split('&'):
+            pair = ms.split('=')
+            temp[pair[0]] = pair[1]
+
+          res['mid'] = temp['mid']
+          res['uid'] = temp['uid']
+          res['screen_name'] = temp['name']
+          res['m_addr'] = temp['url']
+
+          #get  create_at
+          for aele in pinfo.find_all('a'):
+            if aele.get('class') == 'date':
+              info2 = aele
+              res['create_at'] = info2['title']
+
+
+      #get u_addr
+      info3 = ps[0].a
+      res['u_addr'] = info3['href']
+
+      #get u_icon_addr_list
+      info4 = ps[0].contents
+      res['u_icon_addr_list'] = []
+      for addr in info4:
+        img = addr.find('img')
+        if img and img != -1:
+          res['u_icon_addr_list'].append(img.get('src'))
+
+      res['u_icon_addr_list'] = ";".join(res['u_icon_addr_list'])
+
+      #get content
+      info5 = ps[0].find('em')
+      temp1 = []
+      for con in info5.contents:
+        temp1.append(con.encode('utf8'))
+
+      #get pic_addr
+      info6 = bdl.ul and bdl.ul.find_all('li') or []
+      res['pic_addr'] = []
+      for pic in info6:
+        img = pic.find('img')
+        if img and img != -1:
+          res['pic_addr'].append(img.get('src'))
+      res['pic_addr'] = ';'.join(res['pic_addr'])
+
+      res['content'] = ''.join(temp1)
+
+      return res
+
+    def strip_script(self,sc):
+        if sc.count('<dl') > 0:
+          #delete commont
+          cmddlr = re.compile(r'<dl class="comment.*?</dl>', re.I)
+          sc = cmddlr.sub('', sc)
+
+          #find all dl
+          dls = re.compile(r'<dl class="feed_list".*?</dl>',re.I).findall(sc)
+
+          weibos = []
+          for dl in dls:
+            weibos.append(self.strip_dl(dl))
+
+          return weibos
+
+
     def copy(self):
-        print '=====================', self.baseurl
         page = self.f.get(self.baseurl)
-        links = re.compile(r'<link[^>]*href=(.*?)[ >]',re.I).findall(page)
-        links.extend( re.compile(r'<script[^>]*src=(.*?)[ >]',re.I).findall(page) )
-        links.extend( re.compile(r'<img[^>]*src=(.*?)[ >]',re.I).findall(page) )
-        templinks = []
-        for link in links:
-            slink = self.strip_link(link)
-            if slink:
-                templinks.append(slink)
-        links = templinks
-        for link in set(links):
-            page = page.replace(link,self.link_alias(link)[1:])
-            self.f.push( self.full_link(link) )
-        open(self.home+'/index.html','w').write(page)
-        while self.f.taskleft():
-            url,page = self.f.pop()
-            if url.endswith('.css'):
-                links = re.compile(r'url\([\'"]?(.*?)[\'"]?\)').findall(page)
-                templinks = []
-                for link in links:
-                    slink = self.strip_link(link)
-                    if slink:
-                        templinks.append(slink)
-                links = templinks
-                for link in set(links):
-                    self.f.push( self.full_link(link,url) )
-                    page = page.replace(link,self.link_alias(link)[1:].replace("media",".."))
-            print 'write to',self.home+self.link_alias(url)
-            try:
-                open(self.home+self.link_alias(url),'wb').write(page)
-            except Exception,what:
-                print what
+        page = page.replace('\\n', '').replace('\\t', '').replace('\\/', '/').replace('\\"', '"').replace('\\u', '\u')#.replace('\\', '')
+        soup = BeautifulSoup(page)
+        scripts = re.compile(r'<script>.*?STK\.pageletM\.view\((.*?)\)</script>',re.I).findall(page)
+        allres = []
+        for sc in scripts:
+          script = self.strip_script(sc)
+          if script:
+            #pdb.set_trace()
+            allres.extend(script)
+        return allres
 
 if __name__ == "__main__":
     if len(sys.argv) == 2:
         url = sys.argv[1]
-        print '===============================url', url
-        SiteCopyer(url).copy()
+        n = 1
+        total = 5
+        allweibos = []
+        while n <= total:
+          url1 = url + '&page=' + str(n)
+          print '===============================url', url1
+          res = SiteCopyer(url1).copy()
+          allweibos.extend(res)
+          n += 1
+
+        myfile = open('/home/charles/work/agile/text.txt','w')
+        temp = []
+        for obj in allweibos:
+          temp.append(str(obj))
+
+        myfile.write(''.join(temp))
+        myfile.close()
     else:
         print "Usage: python "+sys.argv[0]+" url"
