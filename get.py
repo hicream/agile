@@ -149,6 +149,7 @@ class Fetcher:
 
 class SiteCopyer:
     def __init__(self,url):
+        #pdb.set_trace()
         self.baseurl = url
         self.home = self.baseurl.split('/')[2]
         self.f = Fetcher(threads=10)
@@ -167,48 +168,6 @@ class SiteCopyer:
             os.mkdir(self.home+'/media/image')
         except Exception,what:
             print what
-
-    def full_link(self,link,baseurl=None):
-        if not baseurl:
-            baseurl = self.baseurl
-        if '?' in link:
-            link = link.rsplit('?',1)[0]
-        if not link.startswith('http://'):
-            if link.startswith('/'):
-                link = '/'.join(baseurl.split('/',3)[:3]) + link
-            elif link.startswith('../'):
-                while link.startswith('../'):
-                    baseurl = baseurl.rsplit('/',2)[0]
-                    link = link[3:]
-                link = baseurl+'/'+link
-            else:
-                link = baseurl.rsplit('/',1)[0]+'/'+link
-        return link
-
-    def link_alias(self,link):
-        link = self.full_link(link)
-        name = link.rsplit('/',1)[1]
-        if '.css' in name:
-            name = name[:name.find('.css')+4]
-            alias = '/media/css/'+name
-        elif '.js' in name:
-            name = name[:name.find('.js')+3]
-            alias = '/media/js/'+name
-        else:
-            alias = '/media/image/'+name
-        return alias
-
-    def strip_link(self,link):
-        if link and (link[0] in ['"',"'"]):
-            link = link[1:]
-        while link and (link[-1] in ['"',"'"]):
-            link = link[:-1]
-        while link.endswith('/'):
-            link = link[:-1]
-        if link and (link[0] not in ["<","'",'"']) and ('feed' not in link):
-            return link
-        else:
-            return ''
 
     def strip_dl(self, dl):
       res = {}
@@ -286,7 +245,13 @@ class SiteCopyer:
 
 
     def copy(self):
-        page = self.f.get(self.baseurl)
+        cookies = {
+            'ALF': '1375867636',
+            'SINAGLOBAL': '9009630936197.938.1373267335738',
+            'ULV': '1373275379136:1:1:1:2638962375931.442.1373275379129:',
+            'un': 'chunlei2046@sina.com'
+          }
+        page = self.f.get(self.baseurl, cookies)
         page = page.replace('\\n', '').replace('\\t', '').replace('\\/', '/').replace('\\"', '"').replace('\\u', '\u')#.replace('\\', '')
         soup = BeautifulSoup(page)
         scripts = re.compile(r'<script>.*?STK\.pageletM\.view\((.*?)\)</script>',re.I).findall(page)
@@ -302,7 +267,7 @@ if __name__ == "__main__":
     if len(sys.argv) == 2:
         url = sys.argv[1]
         n = 1
-        total = 5
+        total = 1
         allweibos = []
         while n <= total:
           url1 = url + '&page=' + str(n)
