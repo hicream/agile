@@ -9,8 +9,10 @@ import time
 from gzip import GzipFile
 from StringIO import StringIO
 from bs4 import BeautifulSoup
+import MySQLdb
 
 #http://s.weibo.com/weibo/qunar&xsort=time&nodup=1
+#http://l-dev1.cc.corp.qunar.com:8080/publicOpinion/querySetting.json
 class ContentEncodingProcessor(urllib2.BaseHandler):
   """A handler to add gzip capabilities to urllib2 requests """
 
@@ -147,10 +149,40 @@ class Fetcher:
             else:
                 return True
 
+class OperDatabase:
+  def __init__(self):
+    self
+
+  def connect(self):
+    #建立和数据库系统的连接
+    conn = MySQLdb.connect(host='localhost', user='root', passwd='11')
+    conn.select_db('publicopinions');
+    ###获取操作游标 
+    return conn.cursor()
+
+  def insert_data(self,data):
+    conn = self.connect()
+
+    #change data
+    vals = []
+    for i in data:
+      vals.append((i["mid"], i["uid"], i["m_addr"], i["screen_name"], i["gender"], i["fans"], i["u_icon_addr_list"], i["create_at"], i["content"], i["pic_addr"], i["keyword"], i["get_timestamp"]))
+
+    #pdb.set_trace()
+    conn.executemany( "insert into opinion_data (mid, uid, m_addr, screen_name, gender, fans, u_icon_addr_list, create_at, content, pic_addr, keyword, get_timestamp) values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)", vals)
+    conn.close()
+
+  def update_flag(self, id):
+    conn = self.connect()
+    conn.executemany( """insert into opinion_data values(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) """, data)
+    conn.close()
+
+
 class SiteCopyer:
     def __init__(self,url):
         #pdb.set_trace()
         self.baseurl = url
+        self.desturl = ''
         self.home = self.baseurl.split('/')[2]
         self.f = Fetcher(threads=10)
         self.create_dir()
@@ -193,6 +225,8 @@ class SiteCopyer:
             if aele.get('class') == 'date':
               info2 = aele
               res['create_at'] = info2['title']
+            else:
+              res['create_at'] = ''
 
 
       #get u_addr
@@ -225,12 +259,17 @@ class SiteCopyer:
       res['pic_addr'] = ';'.join(res['pic_addr'])
 
       res['content'] = ''.join(temp1)
+      res['gender'] = ''
+      res['fans'] = 0
+      #TODO: add
+      res['keyword'] = ''
+      res['get_timestamp'] = ''
 
       return res
 
     def strip_script(self,sc):
-        if sc.count('<dl') > 0:
-          #delete commont
+      if sc.count('<dl') > 0:
+        #delete commont
           cmddlr = re.compile(r'<dl class="comment.*?</dl>', re.I)
           sc = cmddlr.sub('', sc)
 
@@ -241,6 +280,7 @@ class SiteCopyer:
           for dl in dls:
             weibos.append(self.strip_dl(dl))
 
+          OperDatabase().insert_data(weibos)
           return weibos
 
 
@@ -263,11 +303,22 @@ class SiteCopyer:
             allres.extend(script)
         return allres
 
+    def sendData(self, data):
+      data = urllib.urlencode(data)
+      request = urllib2.Request(self.desturl, data)
+      response = urllib2.urlopen(request)
+      if response.code == 200:
+        # dowork
+        return false
+      else:
+        # dowork
+        return true
+
 if __name__ == "__main__":
     if len(sys.argv) == 2:
         url = sys.argv[1]
         n = 1
-        total = 1
+        total = 2
         allweibos = []
         while n <= total:
           url1 = url + '&page=' + str(n)
