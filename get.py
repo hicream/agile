@@ -165,15 +165,22 @@ class OperDatabase:
 
   def insert_data(self,data):
     conn = self.connect()
-
-    #change data
-    vals = []
-    for i in data:
-      vals.append((i["mid"].encode('utf-8'), i["uid"].encode('utf-8'), i["m_addr"].encode('utf-8'), i["screen_name"].encode('utf-8'), i["gender"].encode('utf-8'), i["fans"], i["u_icon_addr_list"].encode('utf-8'), i["create_at"].encode('utf-8'), i["content"].encode('utf-8'), i["pic_addr"].encode('utf-8'), i["keyword"].encode('utf-8'), i["get_timestamp"].encode('utf-8'), i["u_addr"].encode('utf-8')))
-
     #pdb.set_trace()
-    conn.executemany( "insert into opinion_data (mid, uid, m_addr, screen_name, gender, fans, u_icon_addr_list, create_at, content, pic_addr, keyword, get_timestamp, u_addr) values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)", vals)
+    length = 0
+    #change data
+    for i in data:
+      val = (i["mid"].encode('utf-8'), i["uid"].encode('utf-8'), i["m_addr"].encode('utf-8'), i["screen_name"].encode('utf-8'), i["gender"].encode('utf-8'), i["fans"], i["u_icon_addr_list"].encode('utf-8'), i["create_at"].encode('utf-8'), i["content"].encode('utf-8'), i["pic_addr"].encode('utf-8'), i["keyword"].encode('utf-8'), i["get_timestamp"].encode('utf-8'), i["u_addr"].encode('utf-8'))
+
+      if self.query_mid(i['mid']):
+        conn.execute( "insert into opinion_data (mid, uid, m_addr, screen_name, gender, fans, u_icon_addr_list, create_at, content, pic_addr, keyword, get_timestamp, u_addr) values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)", val)
+        length += 1
+    print '=======================insert ', length, '======all==', len(data)
     conn.close()
+
+  def query_mid(self, mid):
+    conn = self.connect()
+    res = conn.execute('select id from opinion_data where mid=' + mid)
+    return False if res > 0 else True
 
   def update_flag(self, id):
     conn = self.connect()
@@ -329,6 +336,7 @@ if __name__ == "__main__":
   #weiboURL = 'http://s.weibo.com/weibo/qunar&xsort=time&nodup=1'
   weiboURL = 'http://s.weibo.com/weibo/'
   try:
+    #pdb.set_trace()
     req = urllib2.Request(getKeywordsUrl)
     req.add_header('Content-Type', 'application/x-www-form-urlencoded')
     response = urllib2.urlopen(req)
