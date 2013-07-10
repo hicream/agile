@@ -10,6 +10,8 @@ from gzip import GzipFile
 from StringIO import StringIO
 from bs4 import BeautifulSoup
 import MySQLdb
+import json
+from urllib import quote;
 
 #http://s.weibo.com/weibo/qunar&xsort=time&nodup=1
 #http://l-dev1.cc.corp.qunar.com:8080/publicOpinion/querySetting.json
@@ -166,10 +168,10 @@ class OperDatabase:
     #change data
     vals = []
     for i in data:
-      vals.append((i["mid"], i["uid"], i["m_addr"], i["screen_name"], i["gender"], i["fans"], i["u_icon_addr_list"], i["create_at"], i["content"], i["pic_addr"], i["keyword"], i["get_timestamp"]))
+      vals.append((i["mid"].encode('utf-8'), i["uid"].encode('utf-8'), i["m_addr"].encode('utf-8'), i["screen_name"].encode('utf-8'), i["gender"].encode('utf-8'), i["fans"], i["u_icon_addr_list"].encode('utf-8'), i["create_at"].encode('utf-8'), i["content"].encode('utf-8'), i["pic_addr"].encode('utf-8'), i["keyword"].encode('utf-8'), i["get_timestamp"].encode('utf-8'), i["u_addr"].encode('utf-8')))
 
     #pdb.set_trace()
-    conn.executemany( "insert into opinion_data (mid, uid, m_addr, screen_name, gender, fans, u_icon_addr_list, create_at, content, pic_addr, keyword, get_timestamp) values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)", vals)
+    conn.executemany( "insert into opinion_data (mid, uid, m_addr, screen_name, gender, fans, u_icon_addr_list, create_at, content, pic_addr, keyword, get_timestamp, u_addr) values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)", vals)
     conn.close()
 
   def update_flag(self, id):
@@ -201,7 +203,7 @@ class SiteCopyer:
         except Exception,what:
             print what
 
-    def strip_dl(self, dl):
+    def strip_dl(self, dl, keyword):
       res = {}
       bdl = BeautifulSoup(dl)
       ps =  bdl.find_all('p') # 2 results;the first is content;the second is controller;
@@ -224,9 +226,9 @@ class SiteCopyer:
           for aele in pinfo.find_all('a'):
             if aele.get('class') == 'date':
               info2 = aele
-              res['create_at'] = info2['title']
+              res['create_at'] = info2.get('title')
             else:
-              res['create_at'] = ''
+              res['create_at'] = '2013-07-07 12:12:12'
 
 
       #get u_addr
@@ -241,13 +243,13 @@ class SiteCopyer:
         if img and img != -1:
           res['u_icon_addr_list'].append(img.get('src'))
 
-      res['u_icon_addr_list'] = ";".join(res['u_icon_addr_list'])
+      res['u_icon_addr_list'] = str(";".join(res['u_icon_addr_list']))
 
       #get content
       info5 = ps[0].find('em')
       temp1 = []
       for con in info5.contents:
-        temp1.append(con.encode('utf8'))
+        temp1.append(str(con))
 
       #get pic_addr
       info6 = bdl.ul and bdl.ul.find_all('li') or []
@@ -256,52 +258,53 @@ class SiteCopyer:
         img = pic.find('img')
         if img and img != -1:
           res['pic_addr'].append(img.get('src'))
-      res['pic_addr'] = ';'.join(res['pic_addr'])
+      #pdb.set_trace()
+      res['pic_addr'] = str(';'.join(res['pic_addr']))
 
-      res['content'] = ''.join(temp1)
-      res['gender'] = ''
+      res['content'] = str(''.join(temp1))
+      res['gender'] = '1'
       res['fans'] = 0
       #TODO: add
-      res['keyword'] = ''
-      res['get_timestamp'] = ''
+      res['keyword'] = keyword
+      res['get_timestamp'] = '2013-07-07 12:12:12'
 
       return res
 
-    def strip_script(self,sc):
+    def strip_script(self,sc, key):
       if sc.count('<dl') > 0:
         #delete commont
-          cmddlr = re.compile(r'<dl class="comment.*?</dl>', re.I)
-          sc = cmddlr.sub('', sc)
+        cmddlr = re.compile(r'<dl class="comment.*?</dl>', re.I)
+        sc = cmddlr.sub('', sc)
 
-          #find all dl
-          dls = re.compile(r'<dl class="feed_list".*?</dl>',re.I).findall(sc)
+        #find all dl
+        dls = re.compile(r'<dl class="feed_list".*?</dl>',re.I).findall(sc)
 
-          weibos = []
-          for dl in dls:
-            weibos.append(self.strip_dl(dl))
+        weibos = []
+        for dl in dls:
+          try:
+            val = self.strip_dl(dl, key)
+            weibos.append(val)
+          except Exception as e:
+            print e
+          else:
+            continue
 
-          OperDatabase().insert_data(weibos)
-          return weibos
+        OperDatabase().insert_data(weibos)
+        return weibos
 
 
-    def copy(self):
-        cookies = {
-            'ALF': '1375867636',
-            'SINAGLOBAL': '9009630936197.938.1373267335738',
-            'ULV': '1373275379136:1:1:1:2638962375931.442.1373275379129:',
-            'un': 'chunlei2046@sina.com'
-          }
-        page = self.f.get(self.baseurl, cookies)
-        page = page.replace('\\n', '').replace('\\t', '').replace('\\/', '/').replace('\\"', '"').replace('\\u', '\u')#.replace('\\', '')
-        soup = BeautifulSoup(page)
-        scripts = re.compile(r'<script>.*?STK\.pageletM\.view\((.*?)\)</script>',re.I).findall(page)
-        allres = []
-        for sc in scripts:
-          script = self.strip_script(sc)
-          if script:
-            #pdb.set_trace()
-            allres.extend(script)
-        return allres
+    def copy(self, key):
+      cookies = { 'ALF': '1375867636', 'SINAGLOBAL': '9009630936197.938.1373267335738', 'ULV': '1373275379136:1:1:1:2638962375931.442.1373275379129:', 'un': 'chunlei2046@sina.com' }
+      page = self.f.get(self.baseurl, cookies)
+      page = page.replace('\\n', '').replace('\\t', '').replace('\\/', '/').replace('\\"', '"').replace('\\u', '\u')#.replace('\\', '')
+      soup = BeautifulSoup(page)
+      scripts = re.compile(r'<script>.*?STK\.pageletM\.view\((.*?)\)</script>',re.I).findall(page)
+      allres = []
+      for sc in scripts:
+        script = self.strip_script(sc, key)
+        if script:
+          allres.extend(script)
+      return allres
 
     def sendData(self, data):
       data = urllib.urlencode(data)
@@ -315,24 +318,42 @@ class SiteCopyer:
         return true
 
 if __name__ == "__main__":
-    if len(sys.argv) == 2:
-        url = sys.argv[1]
-        n = 1
-        total = 2
-        allweibos = []
-        while n <= total:
-          url1 = url + '&page=' + str(n)
-          print '===============================url', url1
-          res = SiteCopyer(url1).copy()
-          allweibos.extend(res)
-          n += 1
+  #get public opinion keyword
+  getKeywordsUrl = 'http://l-dev1.cc.corp.qunar.com:8080/publicopinion/querySetting.json?currentId=63616C6C496E2C34343735353531363132343734&keyWordsStatus=1'
+  #weiboURL = 'http://s.weibo.com/weibo/qunar&xsort=time&nodup=1'
+  weiboURL = 'http://s.weibo.com/weibo/'
+  try:
+    req = urllib2.Request(getKeywordsUrl)
+    req.add_header('Content-Type', 'application/x-www-form-urlencoded')
+    response = urllib2.urlopen(req)
 
-        myfile = open('/home/charles/work/agile/text.txt','w')
-        temp = []
-        for obj in allweibos:
-          temp.append(str(obj))
+    if response.code == 200:
+      data = response.read()
+      dataJ = json.loads(data.replace('\\n', ''))
+      realData = dataJ['data']
+      # only support weibo.com
+      for d in realData:
+        if d['product'] == 'weibo':
+          keywords = d['keywords']
+          for k in keywords:
+            n = 1
+            total = 2
+            allweibos = []
+            #pdb.set_trace()
+            while n <= total:
+              url1 = weiboURL + quote(k.encode('UTF-8')) + '&xsort=time&nodup=1&page=' + str(n)
+              print '===============================url', url1
+              res = SiteCopyer(url1).copy(k)
+              allweibos.extend(res)
+              n += 1
 
-        myfile.write(''.join(temp))
-        myfile.close()
-    else:
-        print "Usage: python "+sys.argv[0]+" url"
+            myfile = open('/home/charles/work/agile/text.txt','w')
+            temp = []
+            for obj in allweibos:
+              temp.append(str(obj))
+
+            myfile.write(''.join(temp))
+            myfile.close()
+
+  except Exception as e:
+    print e
