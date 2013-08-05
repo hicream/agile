@@ -299,7 +299,24 @@ class SiteCopyer:
 
 
   def copy(self, key):
-    cookies = { 'ALF': '1375867636', 'SINAGLOBAL': '9009630936197.938.1373267335738', 'ULV': '1373275379136:1:1:1:2638962375931.442.1373275379129:', 'un': 'chunlei2046@sina.com' }
+    cookies  = {
+      'SINAGLOBAL':'1804934195242.8223.1373276867009',
+      'un':'chunlei2046@sina.com',
+      'wvr':'5',
+      'SUE':'es%3Db8d889f9dfe4e33d5db2b9c265ef7496%26ev%3Dv1%26es2%3D28f09470040bc93619c24526ae26c7f9%26rs0%3DwAYZ9Da7FsQynfDCCnTIL1z6u0YGdFZy0m1gOV%252B8T6XhrLYPg7FH2vqJ4oApR3cr3ceNCQd403x0vHQWE5mZ%252FX7mjHNqdPM%252FP5vli6nagZpUNq48HzUx%252Bt1r%252F5AIICUi8RDkDyFwyKORMdNPglSLd%252F0FhatO0lR7Z0idNIoDi9s%253D%26rv%3D0',
+      'SUP':'cv%3D1%26bt%3D1375668307%26et%3D1375754707%26d%3Dc909%26i%3D8df0%26us%3D1%26vf%3D0%26vt%3D0%26ac%3D%26st%3D0%26uid%3D1254052717%26name%3Dchunlei2046%2540sina.com%26nick%3Dchunlei2046%26fmp%3D%26lcp%3D2011-12-13%252012%253A28%253A27',
+      'SUS':'SID-1254052717-1375668307-JA-9v8z1-a6759f63640bc5816ed22d1f0ef9b693',
+      'ALF':'1378260306',
+      'SSOLoginState':'1375668307',
+      'USRUG':'usrmdins41466',
+      '_s_tentry':'www.admin10000.com',
+      'UOR':'s.weibo.com, s.weibo.com, www.uisdc.com',
+      'Apache':'2051445147953.9275.1375670521528',
+      'ULV':'1375670521548:24:4:1:2051445147953.9275.1375670521528:1375541681012',
+      'USRHAWB':'usrmdins312_240',
+      'SinaRot_wb_r_topic':'76'
+    }
+
     page = self.f.get(self.baseurl, cookies)
     page = page.replace('\\n', '').replace('\\t', '').replace('\\/', '/').replace('\\"', '"').replace('\\u', '\u')#.replace('\\', '')
     soup = BeautifulSoup(page)
@@ -334,23 +351,21 @@ class LoginWeibo:
     urllib2.install_opener(opener)
 
     self.postdata = {
-        'entry': 'weibo',
-        'gateway': '1',
-        'from': '',
-        'savestate': '7',
-        'userticket': '1',
-        'ssosimplelogin': '1',
-        'vsnf': '1',
-        'vsnval': '',
-        'su': '',
-        'service': 'miniblog',
-        'servertime': '',
-        'nonce': '',
-        'pwencode': 'wsse',
-        'sp': '',
-        'encoding': 'UTF-8',
-        'url': 'http://weibo.com/ajaxlogin.php?framelogin=1&callback=parent.sinaSSOController.feedBackUrlCallBack',
-        'returntype': 'META'
+      SINAGLOBAL:'1804934195242.8223.1373276867009',
+      un:'chunlei2046@sina.com',
+      wvr:'5',
+      SUE:'es%3Db8d889f9dfe4e33d5db2b9c265ef7496%26ev%3Dv1%26es2%3D28f09470040bc93619c24526ae26c7f9%26rs0%3DwAYZ9Da7FsQynfDCCnTIL1z6u0YGdFZy0m1gOV%252B8T6XhrLYPg7FH2vqJ4oApR3cr3ceNCQd403x0vHQWE5mZ%252FX7mjHNqdPM%252FP5vli6nagZpUNq48HzUx%252Bt1r%252F5AIICUi8RDkDyFwyKORMdNPglSLd%252F0FhatO0lR7Z0idNIoDi9s%253D%26rv%3D0',
+      SUP:'cv%3D1%26bt%3D1375668307%26et%3D1375754707%26d%3Dc909%26i%3D8df0%26us%3D1%26vf%3D0%26vt%3D0%26ac%3D%26st%3D0%26uid%3D1254052717%26name%3Dchunlei2046%2540sina.com%26nick%3Dchunlei2046%26fmp%3D%26lcp%3D2011-12-13%252012%253A28%253A27',
+      SUS:'SID-1254052717-1375668307-JA-9v8z1-a6759f63640bc5816ed22d1f0ef9b693',
+      ALF:'1378260306',
+      SSOLoginState:'1375668307',
+      USRUG:'usrmdins41466',
+      _s_tentry:'www.admin10000.com',
+      UOR:'s.weibo.com, s.weibo.com, www.uisdc.com',
+      Apache:'2051445147953.9275.1375670521528',
+      ULV:'1375670521548:24:4:1:2051445147953.9275.1375670521528:1375541681012',
+      USRHAWB:'usrmdins312_240',
+      SinaRot_wb_r_topic:'76'
     }
 
   def get_servertime(self):
@@ -394,7 +409,6 @@ class LoginWeibo:
     self.postdata = urllib.urlencode(self.postdata)
     headers = {'User-Agent':'Mozilla/5.0 (X11; Linux i686; rv:8.0) Gecko/20100101 Firefox/8.0'}
     #其实到了这里，已经能够使用urllib2请求新浪任何的内容了，这里已经登陆成功了
-    pdb.set_trace()
     req  = urllib2.Request( url = url, data = self.postdata, headers = headers)
     result = urllib2.urlopen(req)
     text = result.read()
@@ -420,8 +434,9 @@ class LoginWeibo:
 
 
 if __name__ == "__main__":
-  LoginWeibo().do_login()
+  #LoginWeibo().do_login()
   #get public opinion keyword
+  pdb.set_trace()
   getKeywordsUrl = 'http://l-dev1.cc.corp.qunar.com:8080/publicopinion/querySetting.json?currentId=63616C6C496E2C34343735353531363132343734&keyWordsStatus=1'
   #weiboURL = 'http://s.weibo.com/weibo/qunar&xsort=time&nodup=1'
   weiboURL = 'http://s.weibo.com/weibo/'
